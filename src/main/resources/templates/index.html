@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Головна - Юридичне Бюро</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="/">⚖️ Юридичне Бюро</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item" sec:authorize="isAnonymous()"><a class="nav-link" th:href="@{/login}">Увійти</a></li>
+                <li class="nav-item" sec:authorize="isAnonymous()"><a class="btn btn-outline-light btn-sm ms-2" th:href="@{/register}">Зареєструватися</a></li>
+                <li class="nav-item" sec:authorize="hasAuthority('CLIENT')"><a class="btn btn-primary btn-sm ms-2" th:href="@{/client/my-cases}">Мій кабінет</a></li>
+                <li class="nav-item" sec:authorize="hasAuthority('LAWYER')"><a class="btn btn-success btn-sm ms-2" th:href="@{/lawyer/my-cases}">Кабінет Адвоката</a></li>
+                <li class="nav-item" sec:authorize="hasAuthority('ADMIN')"><a class="btn btn-danger btn-sm ms-2" th:href="@{/admin/dashboard}">Панель Адміна</a></li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post" class="d-inline ms-2"><button class="btn btn-outline-light btn-sm" type="submit">Вийти</button></form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container text-center mt-5">
+    <h1 class="display-4 fw-bold">Ваш надійний юридичний захист</h1>
+    <p class="lead text-muted mb-5">Прозорість, професіоналізм та конфіденційність.</p>
+
+    <div class="row justify-content-center g-4">
+        <div class="col-md-5">
+            <div class="card h-100 shadow-sm border-0 py-4">
+                <h4>👨‍⚖️ Наші Адвокати</h4>
+                <p class="text-muted small px-3">Перегляньте профілі наших спеціалістів та їх спеціалізації.</p>
+                <div><a th:href="@{/public/lawyers}" class="btn btn-outline-primary">Перейти до каталогу</a></div>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <div class="card h-100 shadow-sm border-0 py-4">
+                <h4>📋 Реєстр Справ</h4>
+                <p class="text-muted small px-3">Загальний реєстр відкритих справ бюро (без приватних деталей).</p>
+                <div><a th:href="@{/public/cases}" class="btn btn-outline-success">Переглянути реєстр</a></div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

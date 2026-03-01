@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Редагування справи</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+<h2>Редагувати справу <span th:text="${legalCase.caseNumber}"></span></h2>
+
+<form th:action="@{/admin/cases/edit/{id}(id=${legalCase.id})}" th:object="${legalCase}" method="post" class="mt-4 w-50">
+
+    <div class="mb-3">
+        <label>Категорія:</label>
+        <select name="categoryId" class="form-select" required>
+            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
+                    th:selected="${cat.id == legalCase.category.id}"></option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Адвокат:</label>
+        <select name="lawyerId" class="form-select" required>
+            <option th:each="lawyer : ${lawyers}" th:value="${lawyer.id}" th:text="${lawyer.fullName}"
+                    th:selected="${legalCase.lawyer != null and lawyer.id == legalCase.lawyer.id}"></option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Статус:</label>
+        <select name="status" class="form-select" required>
+            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+                    th:selected="${s == legalCase.status}"></option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>Опис (може містити приватні дані):</label>
+        <textarea th:field="*{description}" class="form-control" rows="4"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success">Оновити справу</button>
+    <a th:href="@{/admin/cases}" class="btn btn-secondary">Скасувати</a>
+</form>
+</body>
+</html>

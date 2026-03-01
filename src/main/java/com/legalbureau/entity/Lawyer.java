@@ -33,4 +33,13 @@ public class Lawyer extends User {
 
     @OneToMany(mappedBy = "lawyer")
     private List<LegalCase> managedCases;
+
+    public String getSpecializationsText() {
+        if (specializations == null || specializations.isEmpty()) {
+            return "Спеціалізацію не вказано";
+        }
+        return specializations.stream()
+                .map(cat -> cat.getName())
+                .collect(java.util.stream.Collectors.joining(", "));
+    }
 }

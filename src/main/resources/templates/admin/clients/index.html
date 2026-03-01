@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Управління клієнтами</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/admin/dashboard">⚖️ Admin Panel</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/dashboard}">📊 Аналітика</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/clients}">👤 Клієнти</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/lawyers}">👨‍⚖️ Адвокати</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/cases}">📁 Справи</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/categories}">🏷️ Категорії</a></li>
+            </ul>
+            <a th:href="@{/}" class="btn btn-outline-light btn-sm">На головну</a>
+        </div>
+    </div>
+</nav>
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>👤 Список клієнтів бюро</h3>
+        <a th:href="@{/admin/clients/create}" class="btn btn-success">➕ Додати клієнта</a>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle mb-0 bg-white border">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>ПІБ</th>
+                <th>Email</th>
+                <th>Телефон</th>
+                <th>Статус</th>
+                <th class="text-center">Дії</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="client : ${clients}">
+                <td th:text="${client.id}"></td>
+                <td class="fw-bold" th:text="${client.fullName}"></td>
+                <td th:text="${client.email}"></td>
+                <td th:text="${client.phone}"></td>
+                <td>
+                    <span th:if="${client.active}" class="badge bg-success">Активний</span>
+                    <span th:unless="${client.active}" class="badge bg-danger">Заблокований</span>
+                </td>
+                <td class="text-center d-flex justify-content-center gap-1">
+                    <a th:href="@{/admin/clients/edit/{id}(id=${client.id})}" class="btn btn-sm btn-primary" title="Редагувати">✏️</a>
+                    <form th:action="@{/admin/clients/toggle-status/{id}(id=${client.id})}" method="post">
+                        <button type="submit" class="btn btn-sm" th:classappend="${client.active ? 'btn-warning' : 'btn-success'}"
+                                th:title="${client.active ? 'Заблокувати' : 'Розблокувати'}"
+                                th:text="${client.active ? '🔒' : '🔓'}"></button>
+                    </form>
+                    <a th:href="@{/admin/clients/delete/{id}(id=${client.id})}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Видалити клієнта? Це назавжди.');" title="Видалити">🗑</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(clients)}">
+                <td colspan="6" class="text-center text-muted py-4">Клієнтів ще немає.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

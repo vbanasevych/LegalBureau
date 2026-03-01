@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Панель Адвоката - Мої справи</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>💼 Мої справи</h2>
+    <div>
+        <a th:href="@{/lawyer/cases/create}" class="btn btn-success me-2">➕ Нова справа</a>
+        <a th:href="@{/lawyer/clients/create}" class="btn btn-outline-success me-2">👤 Новий клієнт</a>
+        <a th:href="@{/}" class="btn btn-secondary">На головну</a>
+    </div>
+</div>
+
+<div class="card bg-light mb-4 border-0 shadow-sm">
+    <div class="card-body">
+        <form th:action="@{/lawyer/my-cases}" method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Номер справи</label>
+                <input type="text" name="caseNumber" class="form-control" placeholder="Введіть CASE-..." th:value="${searchCaseNumber}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Категорія</label>
+                <select name="categoryId" class="form-select">
+                    <option value="">Усі категорії</option>
+                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${cat.id == searchCategoryId}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Статус</label>
+                <select name="status" class="form-select">
+                    <option value="">Усі статуси</option>
+                    <option th:each="st : ${statuses}" th:value="${st.name()}" th:text="${st.displayValue}" th:selected="${st == searchStatus}"></option>
+                </select>
+            </div>
+            <div class="col-md-3 d-grid gap-2 d-md-flex">
+                <button type="submit" class="btn btn-primary w-100">Шукати</button>
+                <a th:href="@{/lawyer/my-cases}" class="btn btn-outline-secondary w-100">Скинути</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="table-responsive shadow-sm rounded mb-4">
+    <table class="table table-hover align-middle mb-0 bg-white">
+        <thead class="table-dark">
+        <tr>
+            <th>Номер</th>
+            <th>Клієнт</th>
+            <th>Категорія</th>
+            <th>Створено</th>
+            <th>Статус</th>
+            <th class="text-center">Дії</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="c : ${casePage.content}">
+            <td class="fw-bold text-primary" th:text="${c.caseNumber}"></td>
+            <td>
+            <td>
+                <div th:text="${c.client != null ? c.client.fullName : 'Видалений клієнт'}"></div>
+                <small class="text-muted" th:text="${c.client != null ? c.client.phone : '-'}"></small>
+            </td>
+            <td th:text="${c.category.name}"></td>
+            <td th:text="${#temporals.format(c.createdAt, 'dd.MM.yyyy')}"></td>
+            <td>
+                <span th:classappend="${c.status.name() == 'NEW' ? 'bg-warning text-dark' :
+                                     (c.status.name() == 'COMPLETED' ? 'bg-success' :
+                                     (c.status.name() == 'DECLINED' ? 'bg-danger' : 'bg-info text-dark'))}"
+                      class="badge" th:text="${c.status.displayValue}"></span>
+            </td>
+            <td class="text-center">
+                <a th:href="@{/lawyer/cases/{id}(id=${c.id})}" class="btn btn-sm btn-outline-primary">Управління</a>
+            </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(casePage.content)}">
+            <td colspan="6" class="text-center text-muted py-4">Справ не знайдено.</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<nav th:if="${casePage.totalPages > 1}">
+    <ul class="pagination justify-content-center">
+        <li class="page-item" th:classappend="${casePage.first ? 'disabled' : ''}">
+            <a class="page-link" th:href="@{/lawyer/my-cases(page=${casePage.number - 1}, caseNumber=${searchCaseNumber}, categoryId=${searchCategoryId}, status=${searchStatus})}">Попередня</a>
+        </li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, casePage.totalPages - 1)}" th:classappend="${casePage.number == i ? 'active' : ''}">
+            <a class="page-link" th:href="@{/lawyer/my-cases(page=${i}, caseNumber=${searchCaseNumber}, categoryId=${searchCategoryId}, status=${searchStatus})}" th:text="${i + 1}"></a>
+        </li>
+        <li class="page-item" th:classappend="${casePage.last ? 'disabled' : ''}">
+            <a class="page-link" th:href="@{/lawyer/my-cases(page=${casePage.number + 1}, caseNumber=${searchCaseNumber}, categoryId=${searchCategoryId}, status=${searchStatus})}">Наступна</a>
+        </li>
+    </ul>
+</nav>
+
+</body>
+</html>

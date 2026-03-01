@@ -1,0 +1,48 @@
+package com.legalbureau.controller;
+
+import com.legalbureau.entity.CaseCategory;
+import com.legalbureau.exception.DuplicateResourceException;
+import com.legalbureau.service.CaseCategoryService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/admin/categories")
+@RequiredArgsConstructor
+public class AdminCategoryController {
+
+    private final CaseCategoryService categoryService;
+
+    @GetMapping
+    public String listCategories(Model model) {
+        model.addAttribute("categories", categoryService.findAll());
+        return "admin/categories/index";
+    }
+
+    @PostMapping("/create")
+    public String createCategory(@RequestParam String name, RedirectAttributes redirectAttributes) {
+        try {
+            CaseCategory category = new CaseCategory();
+            category.setName(name);
+            categoryService.save(category);
+            redirectAttributes.addFlashAttribute("success", "Категорію успішно додано!");
+        } catch (DuplicateResourceException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/categories";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.delete(id);
+            redirectAttributes.addFlashAttribute("success", "Категорію видалено.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Не вдалося видалити категорію. Можливо, до неї прив'язані справи або адвокати.");
+        }
+        return "redirect:/admin/categories";
+    }
+}

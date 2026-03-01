@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Каталог адвокатів</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head>
+<body class="container mt-5">
+<div class="d-flex justify-content-between mb-4">
+    <h2>Каталог адвокатів</h2>
+    <a th:href="@{/}" class="btn btn-secondary">На головну</a>
+</div>
+
+<div class="card bg-light mb-4 border-0 shadow-sm">
+    <div class="card-body">
+        <form th:action="@{/public/lawyers}" method="get" class="row g-3">
+            <div class="col-md-5"><input type="text" name="name" class="form-control" placeholder="Пошук за ПІБ..." th:value="${searchName}"></div>
+            <div class="col-md-4">
+                <select name="categoryId" class="form-select">
+                    <option value="">Усі спеціалізації</option>
+                    <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${cat.id == searchCategoryId}"></option>
+                </select>
+            </div>
+            <div class="col-md-3 d-grid"><button type="submit" class="btn btn-primary">🔍 Знайти</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4" th:each="lawyer : ${lawyerPage.content}">
+        <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-primary" th:text="${lawyer.fullName}"></h5>
+                <h6 class="card-subtitle mb-2 text-muted" th:text="${lawyer.city}"></h6><hr>
+                <p class="card-text small mb-1"><strong>Спеціалізації:</strong> <span th:text="${lawyer.specializationsText}"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(lawyerPage.content)}" class="col-12 text-center text-muted py-5">
+        <h5>На жаль, за вашим запитом нічого не знайдено.</h5>
+        <a th:href="@{/public/lawyers}" class="btn btn-outline-secondary mt-3">Скинути фільтри</a>
+    </div>
+</div>
+
+<nav th:if="${lawyerPage.totalPages > 1}" class="mt-4">
+    <ul class="pagination justify-content-center">
+        <li class="page-item" th:classappend="${lawyerPage.first ? 'disabled' : ''}"><a class="page-link" th:href="@{/public/lawyers(page=${lawyerPage.number - 1}, name=${searchName}, categoryId=${searchCategoryId})}">Попередня</a></li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(0, lawyerPage.totalPages - 1)}" th:classappend="${lawyerPage.number == i ? 'active' : ''}"><a class="page-link" th:href="@{/public/lawyers(page=${i}, name=${searchName}, categoryId=${searchCategoryId})}" th:text="${i + 1}"></a></li>
+        <li class="page-item" th:classappend="${lawyerPage.last ? 'disabled' : ''}"><a class="page-link" th:href="@{/public/lawyers(page=${lawyerPage.number + 1}, name=${searchName}, categoryId=${searchCategoryId})}">Наступна</a></li>
+    </ul>
+</nav>
+</body>
+</html>

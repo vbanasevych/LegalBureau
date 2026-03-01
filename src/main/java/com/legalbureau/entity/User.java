@@ -30,4 +30,7 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "client")
     private List<LegalCase> clientCases;
+
+    @Column(name = "is_active")
+    private boolean isActive = true;
 }

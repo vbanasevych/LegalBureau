@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управління справою</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+
+<div class="mb-3">
+    <a th:href="@{/lawyer/my-cases}" class="btn btn-secondary btn-sm">← Повернутися до списку</a>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0" th:text="'Справа: ' + ${legalCase.caseNumber}"></h4>
+        <span class="badge bg-light text-dark fs-6" th:text="${legalCase.status.displayValue}"></span>
+    </div>
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Клієнт:</strong> <span th:text="${legalCase.client != null ? legalCase.client.fullName : 'Видалений клієнт'}"></span></p>
+                <p class="mb-1"><strong>Телефон:</strong> <span th:text="${legalCase.client != null ? legalCase.client.phone : '-'}"></span></p>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-1"><strong>Категорія:</strong> <span th:text="${legalCase.category.name}"></span></p>
+                <p class="mb-1"><strong>Дата створення:</strong> <span th:text="${#temporals.format(legalCase.createdAt, 'dd.MM.yyyy HH:mm')}"></span></p>
+                <p class="mb-1 text-success" th:if="${legalCase.status.name() == 'COMPLETED'}">
+                    <strong>Дата завершення:</strong> <span th:text="${#temporals.format(legalCase.finishedAt, 'dd.MM.yyyy HH:mm')}"></span>
+                </p>
+            </div>
+        </div>
+
+        <hr>
+        <h5 class="text-primary">Опис проблеми від клієнта:</h5>
+        <div class="bg-light p-3 rounded text-muted" th:text="${legalCase.description}"></div>
+
+        <hr>
+        <div class="bg-white p-3 border rounded">
+            <h5 class="mb-3">Змінити статус справи:</h5>
+            <form th:action="@{/lawyer/cases/{id}/status(id=${legalCase.id})}" method="post" class="d-flex align-items-center">
+                <select name="status" class="form-select w-50 me-3">
+                    <option th:each="s : ${statuses}"
+                            th:value="${s}"
+                            th:text="${s.displayValue}"
+                            th:selected="${s == legalCase.status}"></option>
+                </select>
+                <button type="submit" class="btn btn-warning">Зберегти статус</button>
+            </form>
+        </div>
+
+        <div th:if="${legalCase.status.name() == 'IN_PROGRESS'}" class="alert alert-info mt-4 mb-0">
+            <hr>
+            <h5 class="text-success mt-4">Надані послуги та витрати:</h5>
+
+            <table class="table table-sm table-bordered mt-2">
+                <thead class="table-light">
+                <tr>
+                    <th>Дата</th>
+                    <th>Назва послуги</th>
+                    <th>Вартість (грн)</th>
+                    <th class="text-center">Дії</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${services}">
+                    <td th:text="${#temporals.format(item.dateAdded, 'dd.MM.yyyy')}"></td>
+                    <td th:text="${item.name}"></td>
+                    <td th:text="${item.price}"></td>
+                    <td class="text-center">
+                        <a th:href="@{/lawyer/cases/{caseId}/services/delete/{itemId}(caseId=${legalCase.id}, itemId=${item.id})}"
+                           class="text-danger text-decoration-none" title="Видалити">✖</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(services)}">
+                    <td colspan="4" class="text-center text-muted">Послуг ще не додано.</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${legalCase.status.name() == 'IN_PROGRESS' or legalCase.status.name() == 'ACCEPTED'}" class="bg-light p-3 border rounded mt-3">
+                <h6 class="mb-2">➕ Додати нову послугу:</h6>
+                <form th:action="@{/lawyer/cases/{id}/services(id=${legalCase.id})}" th:object="${newServiceItem}" method="post" class="row g-2 align-items-center">
+                    <div class="col-md-6">
+                        <input type="text" th:field="*{name}" class="form-control form-control-sm" placeholder="Наприклад: Представництво в суді" required>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group input-group-sm">
+                            <input type="number" step="50" th:field="*{price}" class="form-control" placeholder="Вартість" required>
+                            <span class="input-group-text">грн</span>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-sm btn-success w-100">Додати</button>
+                    </div>
+                </form>
+            </div>
+            <div class="mt-5">
+                <h5 class="text-primary">📅 Розклад по справі (Суди та Консультації)</h5>
+                <hr>
+
+                <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                <div class="table-responsive shadow-sm rounded mb-4">
+                    <table class="table table-bordered mb-0 bg-white">
+                        <thead class="table-primary">
+                        <tr>
+                            <th>Дата та Час</th>
+                            <th>Тип події</th>
+                            <th>Місце проведення</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="h : ${hearings}">
+                            <td class="fw-bold" th:text="${#temporals.format(h.hearingDate, 'dd.MM.yyyy HH:mm')}"></td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${h.type.name() == 'COURT' ? 'bg-danger' : 'bg-info text-dark'}"
+                                      th:text="${h.type.displayValue}"></span>
+                            </td>
+                            <td th:text="${h.place}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(hearings)}">
+                            <td colspan="3" class="text-center text-muted py-3">Подій ще не заплановано.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div th:if="${legalCase.status.name() != 'COMPLETED' and legalCase.status.name() != 'DECLINED'}" class="bg-light p-3 border rounded">
+                    <h6 class="mb-3">🕒 Запланувати нову подію:</h6>
+                    <form th:action="@{/lawyer/cases/{id}/hearings(id=${legalCase.id})}" th:object="${newHearing}" method="post" class="row g-3 align-items-end">
+
+                        <div class="col-md-3">
+                            <label class="form-label small">Дата і час початку</label>
+                            <input type="datetime-local" th:field="*{hearingDate}" class="form-control" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label small">Тип події</label>
+                            <select th:field="*{type}" class="form-select" required>
+                                <option value="CONSULTATION">Консультація (1 година)</option>
+                                <option value="COURT">Судове засідання (Весь день)</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label small">Місце проведення / Посилання</label>
+                            <input type="text" th:field="*{place}" class="form-control" placeholder="Назва суду або Zoom">
+                        </div>
+
+                        <div class="col-md-2 d-grid">
+                            <button type="submit" class="btn btn-primary">Зберегти</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

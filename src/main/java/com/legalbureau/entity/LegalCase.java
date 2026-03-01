@@ -33,8 +33,8 @@ public class LegalCase extends BaseEntity {
     @Column(nullable = false)
     private CaseStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id")
     private User client;
 
     @ManyToOne

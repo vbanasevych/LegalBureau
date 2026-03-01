@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управління категоріями</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/admin/dashboard">⚖️ Admin Panel</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/dashboard}">📊 Аналітика</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/clients}">👤 Клієнти</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/lawyers}">👨‍⚖️ Адвокати</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/cases}">📁 Справи</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/admin/categories}">🏷️ Категорії</a></li>
+            </ul>
+            <a th:href="@{/}" class="btn btn-outline-light btn-sm">На головну</a>
+        </div>
+    </div>
+</nav>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h3>Довідник: Категорії справ</h3>
+
+            <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+            <table class="table table-bordered table-striped mt-3">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Назва категорії</th>
+                    <th class="text-center">Дії</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="cat : ${categories}">
+                    <td th:text="${cat.id}"></td>
+                    <td class="fw-bold" th:text="${cat.name}"></td>
+                    <td class="text-center">
+                        <a th:href="@{/admin/categories/delete/{id}(id=${cat.id})}" class="btn btn-sm btn-danger"
+                           onclick="return confirm('Ви впевнені?');">Видалити</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">➕ Додати категорію</h5>
+                    <form th:action="@{/admin/categories/create}" method="post">
+                        <div class="mb-3">
+                            <input type="text" name="name" class="form-control" placeholder="Наприклад: Сімейне право"
+                                   required>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">Додати</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,3 +1,11 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changeset/01-init-schema.sql
+  - include:
+      file: db/changelog/changeset/02-init-data.sql
+  - include:
+      file: db/changelog/changeset/03-add-hearing-type.sql
+  - include:
+      file: db/changelog/changeset/04-add-user-active-status.sql
+  - include:
+      file: db/changelog/changeset/05-unlink-cases.sql
