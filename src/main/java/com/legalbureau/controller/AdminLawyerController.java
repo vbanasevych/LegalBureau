@@ -24,8 +24,14 @@ public class AdminLawyerController {
     private final UserService userService;
 
     @GetMapping
-    public String listLawyers(Model model) {
-        model.addAttribute("lawyers", lawyerService.findAll());
+    public String listLawyers(@RequestParam(required = false) String name,
+                              @RequestParam(required = false) Long categoryId,
+                              @RequestParam(defaultValue = "0") int page,
+                              Model model) {
+        model.addAttribute("lawyerPage", lawyerService.getFilteredLawyers(name, categoryId, page, 10));
+        model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("searchName", name);
+        model.addAttribute("searchCategoryId", categoryId);
         return "admin/lawyers/index";
     }
 

@@ -135,6 +135,12 @@ public class LegalCaseService {
         return caseRepository.findFilteredByLawyerId(lawyerId, safeSearchStr, categoryId, status, pageable);
     }
 
+    public Page<LegalCase> getFilteredCasesForAdmin(String caseNumber, Long categoryId, CaseStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String safeSearch = (caseNumber == null || caseNumber.trim().isEmpty()) ? null : "%" + caseNumber.trim().toLowerCase() + "%";
+        return caseRepository.findAllFilteredForAdmin(safeSearch, categoryId, status, pageable);
+    }
+
     @Transactional
     public void cancelCaseByClient(Long caseId, Long clientId) {
         LegalCase legalCase = getCaseDetailsWithPrivacy(caseId, clientId, com.legalbureau.entity.enums.Role.CLIENT);

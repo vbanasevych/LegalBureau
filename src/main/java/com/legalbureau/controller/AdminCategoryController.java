@@ -17,8 +17,11 @@ public class AdminCategoryController {
     private final CaseCategoryService categoryService;
 
     @GetMapping
-    public String listCategories(Model model) {
-        model.addAttribute("categories", categoryService.findAll());
+    public String listCategories(@RequestParam(required = false) String search,
+                                 @RequestParam(defaultValue = "0") int page,
+                                 Model model) {
+        model.addAttribute("categoryPage", categoryService.getFilteredCategories(search, page, 10));
+        model.addAttribute("searchQuery", search);
         return "admin/categories/index";
     }
 

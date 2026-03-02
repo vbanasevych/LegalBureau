@@ -47,4 +47,13 @@ public interface LegalCaseRepository extends JpaRepository<LegalCase, Long> {
                                            @Param("categoryId") Long categoryId,
                                            @Param("status") CaseStatus status,
                                            Pageable pageable);
+
+    @Query("SELECT c FROM LegalCase c WHERE " +
+            "(:caseNumber IS NULL OR LOWER(c.caseNumber) LIKE :caseNumber) AND " +
+            "(:categoryId IS NULL OR c.category.id = :categoryId) AND " +
+            "(:status IS NULL OR c.status = :status) ORDER BY c.createdAt DESC")
+    org.springframework.data.domain.Page<LegalCase> findAllFilteredForAdmin(@Param("caseNumber") String caseNumber,
+                                                                            @Param("categoryId") Long categoryId,
+                                                                            @Param("status") com.legalbureau.entity.enums.CaseStatus status,
+                                                                            Pageable pageable);
 }

@@ -20,8 +20,18 @@ public class AdminLegalCaseController {
     private final CaseCategoryService categoryService;
 
     @GetMapping
-    public String listAllCases(Model model) {
-        model.addAttribute("cases", caseService.findAll());
+    public String listAllCases(@RequestParam(required = false) String caseNumber,
+                               @RequestParam(required = false) Long categoryId,
+                               @RequestParam(required = false) CaseStatus status,
+                               @RequestParam(defaultValue = "0") int page,
+                               Model model) {
+        model.addAttribute("casePage", caseService.getFilteredCasesForAdmin(caseNumber, categoryId, status, page, 10));
+        model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("statuses", CaseStatus.values());
+
+        model.addAttribute("searchCaseNumber", caseNumber);
+        model.addAttribute("searchCategoryId", categoryId);
+        model.addAttribute("searchStatus", status);
         return "admin/cases/index";
     }
 

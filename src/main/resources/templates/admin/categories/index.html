@@ -23,30 +23,59 @@
 <div class="container mt-5">
     <div class="row">
         <div class="col-md-8">
-            <h3>Довідник: Категорії справ</h3>
+            <h3 class="mb-4">🏷️ Довідник: Категорії справ</h3>
 
             <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
             <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-            <table class="table table-bordered table-striped mt-3">
-                <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Назва категорії</th>
-                    <th class="text-center">Дії</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="cat : ${categories}">
-                    <td th:text="${cat.id}"></td>
-                    <td class="fw-bold" th:text="${cat.name}"></td>
-                    <td class="text-center">
-                        <a th:href="@{/admin/categories/delete/{id}(id=${cat.id})}" class="btn btn-sm btn-danger"
-                           onclick="return confirm('Ви впевнені?');">Видалити</a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+            <form th:action="@{/admin/categories}" method="get" class="row g-2 mb-3">
+                <div class="col-md-8">
+                    <input type="text" name="search" class="form-control" placeholder="Пошук за назвою..." th:value="${searchQuery}">
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-50">Шукати</button>
+                    <a th:href="@{/admin/categories}" class="btn btn-outline-secondary w-50">Скинути</a>
+                </div>
+            </form>
+
+            <div class="table-responsive shadow-sm rounded bg-white">
+                <table class="table table-hover align-middle border mb-0">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Назва категорії</th>
+                        <th class="text-center">Дії</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="cat : ${categoryPage.content}">
+                        <td th:text="${cat.id}"></td>
+                        <td class="fw-bold" th:text="${cat.name}"></td>
+                        <td class="text-center">
+                            <a th:href="@{/admin/categories/delete/{id}(id=${cat.id})}" class="btn btn-sm btn-danger"
+                               onclick="return confirm('Ви впевнені?');">🗑</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(categoryPage.content)}">
+                        <td colspan=\"3\" class="text-center text-muted py-3">Категорій не знайдено.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <nav th:if="${categoryPage.totalPages > 1}" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${categoryPage.first ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/admin/categories(page=${categoryPage.number - 1}, search=${searchQuery})}">Попередня</a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, categoryPage.totalPages - 1)}" th:classappend="${categoryPage.number == i ? 'active' : ''}">
+                        <a class="page-link" th:href="@{/admin/categories(page=${i}, search=${searchQuery})}" th:text="${i + 1}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${categoryPage.last ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/admin/categories(page=${categoryPage.number + 1}, search=${searchQuery})}">Наступна</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
 
         <div class="col-md-4">

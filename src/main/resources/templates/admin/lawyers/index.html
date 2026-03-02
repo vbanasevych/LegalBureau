@@ -23,9 +23,25 @@
 </nav>
 <div class="container mt-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Список адвокатів бюро</h2>
+        <h2>👨‍⚖️ Список адвокатів бюро</h2>
         <a th:href="@{/admin/lawyers/create}" class="btn btn-success">➕ Додати адвоката</a>
     </div>
+
+    <form th:action="@{/admin/lawyers}" method="get" class="row g-3 mb-4">
+        <div class="col-md-5">
+            <input type="text" name="name" class="form-control" placeholder="Пошук за ПІБ..." th:value="${searchName}">
+        </div>
+        <div class="col-md-4 d-grid gap-2 d-md-flex">
+            <select name="categoryId" class="form-select">
+                <option value="">Усі спеціалізації</option>
+                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${cat.id == searchCategoryId}"></option>
+            </select>
+        </div>
+        <div class="col-md-3 d-grid gap-2 d-md-flex">
+            <button type="submit" class="btn btn-primary w-100">Шукати</button>
+            <a th:href="@{/admin/lawyers}" class="btn btn-outline-secondary w-100">Скинути</a>
+        </div>
+    </form>
 
     <table class="table table-bordered table-striped mt-3">
         <thead class="table-dark">
@@ -41,7 +57,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="lawyer : ${lawyers}">
+        <tr th:each="lawyer : ${lawyerPage.content}">
             <td th:text="${lawyer.id}"></td>
             <td class="fw-bold" th:text="${lawyer.fullName}"></td>
             <td th:text="${lawyer.email}"></td>
@@ -69,8 +85,24 @@
                    onclick="return confirm('Ви впевнені, що хочете видалити цього адвоката?');" title="Видалити">🗑</a>
             </td>
         </tr>
+        <tr th:if="${#lists.isEmpty(lawyerPage.content)}">
+            <td colspan="6" class="text-center text-muted py-4">Адвокатів ще немає.</td>
+        </tr>
         </tbody>
     </table>
+    <nav th:if="${lawyerPage.totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${lawyerPage.first ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/admin/lawyers(page=${lawyerPage.number - 1}, name=${searchName}, categoryId=${searchCategoryId})}">Попередня</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, lawyerPage.totalPages - 1)}" th:classappend="${lawyerPage.number == i ? 'active' : ''}">
+                <a class="page-link" th:href="@{/admin/lawyers(page=${i}, name=${searchName}, categoryId=${searchCategoryId})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${lawyerPage.last ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/admin/lawyers(page=${lawyerPage.number + 1}, name=${searchName}, categoryId=${searchCategoryId})}">Наступна</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

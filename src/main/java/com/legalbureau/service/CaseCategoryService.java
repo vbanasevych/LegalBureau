@@ -5,6 +5,9 @@ import com.legalbureau.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.CaseCategory;
 import com.legalbureau.repository.CaseCategoryRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,22 +27,17 @@ public class CaseCategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Категорію не знайдено"));
     }
 
+    public Page<CaseCategory> getFilteredCategories(String search, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String safeSearch = (search == null || search.trim().isEmpty()) ? null : "%" + search.trim().toLowerCase() + "%";
+        return repository.findFilteredCategories(safeSearch, pageable);
+    }
+
     public void save(CaseCategory category) {
         if (repository.existsByName(category.getName())) {
             throw new DuplicateResourceException("Категорія з назвою '" + category.getName() + "' вже існує");
         }
         repository.save(category);
-    }
-
-    public void update(Long id, CaseCategory updatedData) {
-        CaseCategory existing = findById(id);
-
-        if (!existing.getName().equals(updatedData.getName()) && repository.existsByName(updatedData.getName())) {
-            throw new DuplicateResourceException("Категорія з назвою '" + updatedData.getName() + "' вже існує");
-        }
-
-        existing.setName(updatedData.getName());
-        repository.save(existing);
     }
 
     public void delete(Long id) {

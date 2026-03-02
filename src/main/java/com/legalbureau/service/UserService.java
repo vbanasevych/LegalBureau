@@ -5,6 +5,9 @@ import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.User;
 import com.legalbureau.exception.DuplicateResourceException;
 import com.legalbureau.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +42,12 @@ public class UserService {
 
     public User findById(Long id) {
         return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Користувача не знайдено"));
+    }
+
+    public Page<User> getFilteredClients(String search, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        String safeSearch = (search == null || search.trim().isEmpty()) ? null : "%" + search.trim().toLowerCase() + "%";
+        return userRepository.findFilteredClients(safeSearch, pageable);
     }
 
     public void createClientByAdmin(User client) {

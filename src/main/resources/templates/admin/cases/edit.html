@@ -28,7 +28,9 @@
     <div class="mb-3">
         <label>Статус:</label>
         <select name="status" class="form-select" required>
-            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s}"
+            <option th:each="s : ${statuses}"
+                    th:value="${s.name()}"
+                    th:text="${s.displayValue}"
                     th:selected="${s == legalCase.status}"></option>
         </select>
     </div>

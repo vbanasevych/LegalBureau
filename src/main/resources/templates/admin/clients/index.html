@@ -26,6 +26,16 @@
     <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
+    <form th:action="@{/admin/clients}" method="get" class="row g-3 mb-4">
+        <div class="col-md-8">
+            <input type="text" name="search" class="form-control" placeholder="Пошук за ім'ям або email..." th:value="${searchQuery}">
+        </div>
+        <div class="col-md-4 d-grid gap-2 d-md-flex">
+            <button type="submit" class="btn btn-primary w-100">Шукати</button>
+            <a th:href="@{/admin/clients}" class="btn btn-outline-secondary w-100">Скинути</a>
+        </div>
+    </form>
+
     <div class="table-responsive shadow-sm rounded">
         <table class="table table-hover align-middle mb-0 bg-white border">
             <thead class="table-dark">
@@ -39,7 +49,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="client : ${clients}">
+            <tr th:each="client : ${clientPage.content}">
                 <td th:text="${client.id}"></td>
                 <td class="fw-bold" th:text="${client.fullName}"></td>
                 <td th:text="${client.email}"></td>
@@ -59,11 +69,24 @@
                        onclick="return confirm('Видалити клієнта? Це назавжди.');" title="Видалити">🗑</a>
                 </td>
             </tr>
-            <tr th:if="${#lists.isEmpty(clients)}">
+            <tr th:if="${#lists.isEmpty(clientPage.content)}">
                 <td colspan="6" class="text-center text-muted py-4">Клієнтів ще немає.</td>
             </tr>
             </tbody>
         </table>
+        <nav th:if="${clientPage.totalPages > 1}" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${clientPage.first ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/admin/clients(page=${clientPage.number - 1}, search=${searchQuery})}">Попередня</a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(0, clientPage.totalPages - 1)}" th:classappend="${clientPage.number == i ? 'active' : ''}">
+                    <a class="page-link" th:href="@{/admin/clients(page=${i}, search=${searchQuery})}" th:text="${i + 1}"></a>
+                </li>
+                <li class="page-item" th:classappend="${clientPage.last ? 'disabled' : ''}">
+                    <a class="page-link" th:href="@{/admin/clients(page=${clientPage.number + 1}, search=${searchQuery})}">Наступна</a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
 </body>

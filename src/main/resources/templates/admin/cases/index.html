@@ -21,7 +21,30 @@
     </div>
 </nav>
 <div class="container mt-5">
-    <h2>Управління всіма справами</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📁 Управління всіма справами</h2>
+    </div>
+    <form th:action="@{/admin/cases}" method="get" class="row g-3 mb-4 bg-white p-3 shadow-sm rounded border">
+        <div class="col-md-3">
+            <input type="text" name="caseNumber" class="form-control" placeholder="Номер CASE-..." th:value="${searchCaseNumber}">
+        </div>
+        <div class="col-md-3">
+            <select name="categoryId" class="form-select">
+                <option value="">Усі категорії</option>
+                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${cat.id == searchCategoryId}"></option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">Усі статуси</option>
+                <option th:each="st : ${statuses}" th:value="${st.name()}" th:text="${st.displayValue}" th:selected="${st == searchStatus}"></option>
+            </select>
+        </div>
+        <div class="col-md-3 d-grid gap-2 d-md-flex">
+            <button type="submit" class="btn btn-primary w-100">Шукати</button>
+            <a th:href="@{/admin/cases}" class="btn btn-outline-secondary w-100">Скинути</a>
+        </div>
+    </form>
 
     <table class="table table-bordered mt-3">
         <thead class="table-dark">
@@ -35,7 +58,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="c : ${cases}">
+        <tr th:each="c : ${casePage.content}">
             <td th:text="${c.caseNumber}"></td>
             <td th:text="${c.client != null ? c.client.fullName : 'Видалений клієнт'}"></td>
             <td th:text="${c.lawyer != null ? c.lawyer.fullName : 'Немає'}"></td>
@@ -47,8 +70,24 @@
                    onclick="return confirm('Видалити цю справу назавжди?');">Видалити</a>
             </td>
         </tr>
+        <tr th:if="${#lists.isEmpty(casePage.content)}">
+            <td colspan="6" class="text-center text-muted py-4">Справ ще немає.</td>
+        </tr>
         </tbody>
     </table>
+    <nav th:if="${casePage.totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${casePage.first ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/admin/cases(page=${casePage.number - 1}, caseNumber=${searchCaseNumber}, categoryId=${searchCategoryId}, status=${searchStatus})}">Попередня</a>
+            </li>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, casePage.totalPages - 1)}" th:classappend="${casePage.number == i ? 'active' : ''}">
+                <a class="page-link" th:href="@{/admin/cases(page=${i}, caseNumber=${searchCaseNumber}, categoryId=${searchCategoryId}, status=${searchStatus})}" th:text="${i + 1}"></a>
+            </li>
+            <li class="page-item" th:classappend="${casePage.last ? 'disabled' : ''}">
+                <a class="page-link" th:href="@{/admin/cases(page=${casePage.number + 1}, caseNumber=${searchCaseNumber}, categoryId=${searchCategoryId}, status=${searchStatus})}">Наступна</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 </body>
 </html>

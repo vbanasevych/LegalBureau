@@ -24,8 +24,11 @@ public class AdminController {
     }
 
     @GetMapping("/clients")
-    public String listClients(Model model) {
-        model.addAttribute("clients", userService.findAllClients());
+    public String listClients(@RequestParam(required = false) String search,
+                              @RequestParam(defaultValue = "0") int page,
+                              Model model) {
+        model.addAttribute("clientPage", userService.getFilteredClients(search, page, 10));
+        model.addAttribute("searchQuery", search);
         return "admin/clients/index";
     }
 
