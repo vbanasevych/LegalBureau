@@ -9,6 +9,8 @@
     <div class="col-md-4">
         <h3 class="text-center mb-4">Вхід у систему</h3>
 
+        <div th:if="${info}" class="alert alert-info text-center shadow-sm" th:text="${info}"></div>
+
         <div th:if="${param.error}" class="alert alert-danger">
             Невірний email або пароль.
         </div>
@@ -31,6 +33,7 @@
         <div class="text-center mt-3">
             <a th:href="@{/register}">Немає акаунту? Зареєструватися</a>
         </div>
+        <a th:href="@{/}" class="btn btn-primary mt-3">🔙 Повернутися на головну</a>
     </div>
 </div>
 </body>

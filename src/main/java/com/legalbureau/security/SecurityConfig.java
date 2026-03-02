@@ -16,11 +16,11 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/public/**", "/register", "/login", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/public/**", "/register", "/login", "/login-required", "/css/**", "/js/**", "/error").permitAll()
 
                         .requestMatchers("/client/**").hasAuthority("CLIENT")
                         .requestMatchers("/lawyer/**").hasAuthority("LAWYER")
-                        .requestMatchers("/admin/**", "/categories/**").hasAuthority("ADMIN")
+                        .requestMatchers("/admin/**").hasAuthority("ADMIN")
 
                         .anyRequest().authenticated()
                 )

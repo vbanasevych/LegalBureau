@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequiredArgsConstructor
@@ -36,5 +37,11 @@ public class AuthController {
             model.addAttribute("error", e.getMessage());
             return "auth/register";
         }
+    }
+
+    @GetMapping("/login-required")
+    public String loginRequired(RedirectAttributes redirectAttributes) {
+        redirectAttributes.addFlashAttribute("info", "👨‍⚖️ Консультацію може отримати лише зареєстрований у бюро користувач. Будь ласка, увійдіть в акаунт або зареєструйтесь.");
+        return "redirect:/login";
     }
 }

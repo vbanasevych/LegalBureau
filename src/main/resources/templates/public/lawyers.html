@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head><title>Каталог адвокатів</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"></head>
 <body class="container mt-5">
 <div class="d-flex justify-content-between mb-4">
@@ -24,12 +24,24 @@
 
 <div class="row g-4 mb-4">
     <div class="col-md-4" th:each="lawyer : ${lawyerPage.content}">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
+        <div class="card h-100 shadow-sm border-0 d-flex flex-column">
+
+            <div class="card-body flex-grow-1">
                 <h5 class="card-title text-primary" th:text="${lawyer.fullName}"></h5>
                 <h6 class="card-subtitle mb-2 text-muted" th:text="${lawyer.city}"></h6><hr>
                 <p class="card-text small mb-1"><strong>Спеціалізації:</strong> <span th:text="${lawyer.specializationsText}"></span></p>
             </div>
+
+            <div class="card-footer bg-white border-0 pt-0 pb-3">
+                <a sec:authorize="isAuthenticated()"
+                   th:href="@{/client/request(lawyerId=${lawyer.id})}"
+                   class="btn btn-primary w-100">Подати запит</a>
+
+                <a sec:authorize="isAnonymous()"
+                   th:href="@{/login-required}"
+                   class="btn btn-outline-primary w-100">Подати запит</a>
+            </div>
+
         </div>
     </div>
 
