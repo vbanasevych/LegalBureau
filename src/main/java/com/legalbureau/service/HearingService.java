@@ -3,6 +3,7 @@ package com.legalbureau.service;
 import com.legalbureau.entity.Hearing;
 import com.legalbureau.entity.LegalCase;
 import com.legalbureau.entity.enums.HearingType;
+import com.legalbureau.entity.enums.Role;
 import com.legalbureau.repository.HearingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,10 @@ public class HearingService {
     }
 
     public void addHearing(Long caseId, Hearing newHearing, Long lawyerId) {
-        LegalCase legalCase = caseService.getCaseDetailsWithPrivacy(caseId, lawyerId, com.legalbureau.entity.enums.Role.LAWYER);
+        if (newHearing.getHearingDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Помилка: Неможливо запланувати подію на минулий час!");
+        }
+        LegalCase legalCase = caseService.getCaseDetailsWithPrivacy(caseId, lawyerId, Role.LAWYER);
 
         LocalDateTime newStart = newHearing.getHearingDate();
         LocalDateTime newEnd;

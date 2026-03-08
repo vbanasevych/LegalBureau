@@ -87,8 +87,18 @@ public class ClientController {
     public String showRequestForm(@RequestParam(required = false) Long lawyerId, Model model) {
         model.addAttribute("legalCase", new LegalCase());
         model.addAttribute("lawyers", lawyerService.findAll());
-        model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("selectedLawyerId", lawyerId);
+
+        if (lawyerId != null) {
+            Lawyer selectedLawyer = lawyerService.findById(lawyerId);
+            if (!selectedLawyer.getSpecializations().isEmpty()) {
+                model.addAttribute("categories", selectedLawyer.getSpecializations());
+            } else {
+                model.addAttribute("categories", categoryService.findAll());
+            }
+        } else {
+            model.addAttribute("categories", categoryService.findAll());
+        }
 
         return "client/request-form";
     }
@@ -103,10 +113,18 @@ public class ClientController {
             Long clientId = userDetails.getUser().getId();
             caseService.createCase(legalCase, clientId, lawyerId, categoryId);
             return "redirect:/client/my-cases";
-        } catch (DuplicateResourceException e) {
+        } catch (DuplicateResourceException | IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             model.addAttribute("lawyers", lawyerService.findAll());
-            model.addAttribute("categories", categoryService.findAll());
+
+            Lawyer selectedLawyer = lawyerService.findById(lawyerId);
+            if (!selectedLawyer.getSpecializations().isEmpty()) {
+                model.addAttribute("categories", selectedLawyer.getSpecializations());
+            } else {
+                model.addAttribute("categories", categoryService.findAll());
+            }
+
+            model.addAttribute("selectedLawyerId", lawyerId);
             return "client/request-form";
         }
     }

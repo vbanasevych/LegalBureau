@@ -9,10 +9,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface HearingRepository extends JpaRepository<Hearing, Long> {
-
-    @Query("SELECT h FROM Hearing h WHERE h.legalCase.lawyer.id = :lawyerId ORDER BY h.hearingDate ASC")
-    List<Hearing> findAllByLawyerIdOrderByHearingDateAsc(@Param("lawyerId") Long lawyerId);
-
     List<Hearing> findAllByLegalCaseIdOrderByHearingDateAsc(Long legalCaseId);
 
     @Query("SELECT h FROM Hearing h JOIN h.legalCase lc WHERE lc.lawyer.id = :lawyerId " +

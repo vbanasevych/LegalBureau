@@ -42,14 +42,12 @@
                 <table class="table table-hover align-middle border mb-0">
                     <thead class="table-dark">
                     <tr>
-                        <th>ID</th>
                         <th>Назва категорії</th>
                         <th class="text-center">Дії</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:each="cat : ${categoryPage.content}">
-                        <td th:text="${cat.id}"></td>
                         <td class="fw-bold" th:text="${cat.name}"></td>
                         <td class="text-center">
                             <a th:href="@{/admin/categories/delete/{id}(id=${cat.id})}" class="btn btn-sm btn-danger"

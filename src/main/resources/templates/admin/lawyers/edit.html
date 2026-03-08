@@ -10,6 +10,13 @@
         <input type="text" th:field="*{fullName}" class="form-control" required/>
     </div>
     <div class="mb-3">
+        <label>Телефон:</label>
+        <input type="text" th:field="*{phone}" class="form-control"
+               placeholder="+380-XXX-XXX-XXX"
+               pattern="\+380-[0-9]{3}-[0-9]{3}-[0-9]{3}"
+               title="Формат номеру має бути: +380-XXX-XXX-XXX" required/>
+    </div>
+    <div class="mb-3">
         <label>Місто:</label>
         <input type="text" th:field="*{city}" class="form-control" required/>
     </div>

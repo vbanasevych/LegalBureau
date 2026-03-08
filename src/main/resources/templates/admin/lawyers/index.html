@@ -46,7 +46,6 @@
     <table class="table table-bordered table-striped mt-3">
         <thead class="table-dark">
         <tr>
-            <th>ID</th>
             <th>ПІБ</th>
             <th>Email</th>
             <th>Місто</th>
@@ -58,7 +57,6 @@
         </thead>
         <tbody>
         <tr th:each="lawyer : ${lawyerPage.content}">
-            <td th:text="${lawyer.id}"></td>
             <td class="fw-bold" th:text="${lawyer.fullName}"></td>
             <td th:text="${lawyer.email}"></td>
             <td th:text="${lawyer.city}"></td>

@@ -1,6 +1,7 @@
 package com.legalbureau.controller;
 
 import com.legalbureau.entity.CaseService;
+import com.legalbureau.entity.Hearing;
 import com.legalbureau.entity.User;
 import com.legalbureau.entity.enums.Role;
 import com.legalbureau.exception.DuplicateResourceException;
@@ -69,7 +70,7 @@ public class LawyerController {
 
         model.addAttribute("hearings", hearingService.getHearingsByCase(id));
 
-        model.addAttribute("newHearing", new com.legalbureau.entity.Hearing());
+        model.addAttribute("newHearing", new Hearing());
         return "lawyer/case-details";
     }
 
@@ -106,7 +107,7 @@ public class LawyerController {
                                @RequestParam String phone,
                                org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         try {
-            com.legalbureau.entity.User client = new com.legalbureau.entity.User();
+            User client = new User();
             client.setEmail(email);
             client.setFullName(fullName);
             client.setPhone(phone);
@@ -118,7 +119,7 @@ public class LawyerController {
             redirectAttributes.addAttribute("clientEmail", email);
             return "redirect:/lawyer/cases/create";
 
-        } catch (DuplicateResourceException e) {
+        } catch (DuplicateResourceException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", "Клієнт з таким email вже існує!");
             return "redirect:/lawyer/clients/create";
         }

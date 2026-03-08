@@ -26,6 +26,7 @@ public class UserService {
     }
 
     public void registerClient(User user) {
+        validatePhoneNumber(user.getPhone());
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new DuplicateResourceException("Користувач з email " + user.getEmail() + " вже існує");
         }
@@ -51,6 +52,7 @@ public class UserService {
     }
 
     public void createClientByAdmin(User client) {
+        validatePhoneNumber(client.getPhone());
         if (userRepository.existsByEmail(client.getEmail())) {
             throw new DuplicateResourceException("Email вже зайнятий!");
         }
@@ -60,6 +62,7 @@ public class UserService {
     }
 
     public void updateClientByAdmin(Long id, User clientData) {
+        validatePhoneNumber(clientData.getPhone());
         User existing = findById(id);
 
         if (!existing.getEmail().equals(clientData.getEmail()) && userRepository.existsByEmail(clientData.getEmail())) {
@@ -88,5 +91,11 @@ public class UserService {
             throw new IllegalArgumentException("Користувача не знайдено");
         }
         userRepository.deleteById(id);
+    }
+
+    private void validatePhoneNumber(String phone) {
+        if (phone == null || !phone.matches("^\\+380-\\d{3}-\\d{3}-\\d{3}$")) {
+            throw new IllegalArgumentException("Невірний формат телефону! Використовуйте: +380-XXX-XXX-XXX");
+        }
     }
 }

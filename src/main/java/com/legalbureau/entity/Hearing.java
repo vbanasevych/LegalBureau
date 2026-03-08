@@ -2,6 +2,8 @@ package com.legalbureau.entity;
 
 import com.legalbureau.entity.enums.HearingType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -20,6 +22,7 @@ public class Hearing {
 
     @Column(name = "hearing_date", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @Future(message = "Консультація/засідання не можуть бути в минулому")
     private LocalDateTime hearingDate;
 
     @Enumerated(EnumType.STRING)

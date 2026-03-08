@@ -40,7 +40,6 @@
         <table class="table table-hover align-middle mb-0 bg-white border">
             <thead class="table-dark">
             <tr>
-                <th>ID</th>
                 <th>ПІБ</th>
                 <th>Email</th>
                 <th>Телефон</th>
@@ -50,7 +49,6 @@
             </thead>
             <tbody>
             <tr th:each="client : ${clientPage.content}">
-                <td th:text="${client.id}"></td>
                 <td class="fw-bold" th:text="${client.fullName}"></td>
                 <td th:text="${client.email}"></td>
                 <td th:text="${client.phone}"></td>

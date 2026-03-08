@@ -33,7 +33,7 @@ public class AuthController {
         try {
             userService.registerClient(user);
             return "redirect:/login";
-        } catch (DuplicateResourceException e) {
+        } catch (DuplicateResourceException | IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "auth/register";
         }

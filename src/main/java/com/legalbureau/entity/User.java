@@ -1,6 +1,7 @@
 package com.legalbureau.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import com.legalbureau.entity.enums.Role;
@@ -22,6 +23,7 @@ public class User extends BaseEntity {
     @Column(name = "full_name")
     private String fullName;
 
+    @Pattern(regexp = "^\\d{4}-\\d{3}-\\d{3}-\\d{4}$", message = "Не правильний формат номеру")
     private String phone;
 
     @Enumerated(EnumType.STRING)

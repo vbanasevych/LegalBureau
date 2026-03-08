@@ -43,7 +43,7 @@ public class AdminController {
         try {
             userService.createClientByAdmin(client);
             redirectAttributes.addFlashAttribute("success", "Клієнта успішно створено.");
-        } catch (DuplicateResourceException e) {
+        } catch (DuplicateResourceException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/admin/clients/create";
         }
@@ -61,7 +61,7 @@ public class AdminController {
         try {
             userService.updateClientByAdmin(id, clientData);
             redirectAttributes.addFlashAttribute("success", "Дані клієнта оновлено.");
-        } catch (DuplicateResourceException e) {
+        } catch (DuplicateResourceException | IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/admin/clients/edit/" + id;
         }

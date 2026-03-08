@@ -28,11 +28,17 @@ public class LawyerService {
     private final CaseCategoryRepository categoryRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public Lawyer findById(Long id) {
+        return lawyerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Адвоката не знайдено"));
+    }
+
     public List<Lawyer> findAll() {
         return lawyerRepository.findAll();
     }
 
     public void createLawyer(Lawyer lawyer, List<Long> categoryIds) {
+        validatePhoneNumber(lawyer.getPhone());
         if (userRepository.existsByEmail(lawyer.getEmail())) {
             throw new DuplicateResourceException("Email " + lawyer.getEmail() + " вже зайнятий");
         }
@@ -48,6 +54,7 @@ public class LawyerService {
     }
 
     public void updateLawyer(Long id, Lawyer updatedData, List<Long> categoryIds) {
+        validatePhoneNumber(updatedData.getPhone());
         Lawyer existing = lawyerRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Адвоката не знайдено"));
 
@@ -76,5 +83,11 @@ public class LawyerService {
     public Page<Lawyer> getFilteredLawyers(String name, Long categoryId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         return lawyerRepository.searchAndFilter(name, categoryId, pageable);
+    }
+
+    private void validatePhoneNumber(String phone) {
+        if (phone == null || !phone.matches("^\\+380-\\d{3}-\\d{3}-\\d{3}$")) {
+            throw new IllegalArgumentException("Невірний формат телефону! Використовуйте: +380-XXX-XXX-XXX");
+        }
     }
 }
