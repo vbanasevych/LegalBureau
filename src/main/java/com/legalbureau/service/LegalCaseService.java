@@ -3,7 +3,7 @@ package com.legalbureau.service;
 
 import com.legalbureau.entity.enums.Role;
 import com.legalbureau.exception.DuplicateResourceException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.CaseCategory;
 import com.legalbureau.entity.Lawyer;
@@ -26,6 +26,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class LegalCaseService {
 
     private final LegalCaseRepository caseRepository;
@@ -42,6 +43,7 @@ public class LegalCaseService {
                 .orElseThrow(() -> new ResourceNotFoundException("Справу не знайдено"));
     }
 
+    @Transactional
     public void createCase(LegalCase legalCase, Long clientId, Long lawyerId, Long categoryId) {
         User client = userRepository.findById(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("Клієнта не знайдено"));
@@ -65,6 +67,7 @@ public class LegalCaseService {
         caseRepository.save(legalCase);
     }
 
+    @Transactional
     public void updateStatus(Long caseId, CaseStatus newStatus) {
         LegalCase legalCase = findById(caseId);
         legalCase.setStatus(newStatus);
@@ -90,6 +93,7 @@ public class LegalCaseService {
         return legalCase;
     }
 
+    @Transactional
     public void updateCaseByAdmin(Long id, LegalCase updatedData, Long categoryId, Long lawyerId) {
         LegalCase existing = findById(id);
 

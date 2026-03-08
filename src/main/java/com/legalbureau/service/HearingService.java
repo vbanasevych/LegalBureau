@@ -5,6 +5,7 @@ import com.legalbureau.entity.LegalCase;
 import com.legalbureau.entity.enums.HearingType;
 import com.legalbureau.entity.enums.Role;
 import com.legalbureau.repository.HearingRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class HearingService {
 
     private final HearingRepository hearingRepository;
@@ -22,6 +24,7 @@ public class HearingService {
         return hearingRepository.findAllByLegalCaseIdOrderByHearingDateAsc(caseId);
     }
 
+    @Transactional
     public void addHearing(Long caseId, Hearing newHearing, Long lawyerId) {
         if (newHearing.getHearingDate().isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("Помилка: Неможливо запланувати подію на минулий час!");

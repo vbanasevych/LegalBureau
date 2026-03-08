@@ -2,6 +2,7 @@ package com.legalbureau.service;
 
 import com.legalbureau.exception.DuplicateResourceException;
 import com.legalbureau.exception.ResourceNotFoundException;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.CaseCategory;
 import com.legalbureau.repository.CaseCategoryRepository;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CaseCategoryService {
 
     private final CaseCategoryRepository repository;
@@ -33,6 +35,7 @@ public class CaseCategoryService {
         return repository.findFilteredCategories(safeSearch, pageable);
     }
 
+    @Transactional
     public void save(CaseCategory category) {
         if (repository.existsByName(category.getName())) {
             throw new DuplicateResourceException("Категорія з назвою '" + category.getName() + "' вже існує");
@@ -40,6 +43,7 @@ public class CaseCategoryService {
         repository.save(category);
     }
 
+    @Transactional
     public void delete(Long id) {
         if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("Категорію не знайдено");

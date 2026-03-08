@@ -1,6 +1,7 @@
 package com.legalbureau.service;
 
 import com.legalbureau.entity.enums.Role;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.User;
 import com.legalbureau.exception.DuplicateResourceException;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository userRepository;
@@ -25,6 +27,7 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
+    @Transactional
     public void registerClient(User user) {
         validatePhoneNumber(user.getPhone());
         if (userRepository.existsByEmail(user.getEmail())) {
@@ -51,6 +54,7 @@ public class UserService {
         return userRepository.findFilteredClients(safeSearch, pageable);
     }
 
+    @Transactional
     public void createClientByAdmin(User client) {
         validatePhoneNumber(client.getPhone());
         if (userRepository.existsByEmail(client.getEmail())) {
@@ -61,6 +65,7 @@ public class UserService {
         userRepository.save(client);
     }
 
+    @Transactional
     public void updateClientByAdmin(Long id, User clientData) {
         validatePhoneNumber(clientData.getPhone());
         User existing = findById(id);
@@ -80,12 +85,14 @@ public class UserService {
         userRepository.save(existing);
     }
 
+    @Transactional
     public User toggleUserStatus(Long id) {
         User user = findById(id);
         user.setActive(!user.isActive());
         return userRepository.save(user);
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             throw new IllegalArgumentException("Користувача не знайдено");

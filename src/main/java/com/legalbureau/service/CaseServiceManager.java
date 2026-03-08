@@ -4,6 +4,7 @@ import com.legalbureau.entity.CaseService;
 import com.legalbureau.entity.LegalCase;
 import com.legalbureau.entity.enums.CaseStatus;
 import com.legalbureau.repository.CaseServiceRepository;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class CaseServiceManager {
 
     private final CaseServiceRepository itemRepository;
@@ -21,6 +23,7 @@ public class CaseServiceManager {
         return itemRepository.findAllByLegalCaseId(caseId);
     }
 
+    @Transactional
     public void addServiceToCase(Long caseId, CaseService item, Long lawyerId) {
         LegalCase legalCase = legalCaseService.getCaseDetailsWithPrivacy(caseId, lawyerId, com.legalbureau.entity.enums.Role.LAWYER);
 
@@ -34,6 +37,7 @@ public class CaseServiceManager {
         itemRepository.save(item);
     }
 
+    @Transactional
     public void deleteItem(Long itemId) {
         itemRepository.deleteById(itemId);
     }

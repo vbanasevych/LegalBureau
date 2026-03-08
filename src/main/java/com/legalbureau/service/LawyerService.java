@@ -1,7 +1,6 @@
 package com.legalbureau.service;
 
-import com.legalbureau.repository.LegalCaseRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.Lawyer;
 import com.legalbureau.entity.enums.Role;
@@ -20,6 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class LawyerService {
 
     private final LawyerRepository lawyerRepository;
@@ -37,6 +37,7 @@ public class LawyerService {
         return lawyerRepository.findAll();
     }
 
+    @Transactional
     public void createLawyer(Lawyer lawyer, List<Long> categoryIds) {
         validatePhoneNumber(lawyer.getPhone());
         if (userRepository.existsByEmail(lawyer.getEmail())) {
@@ -53,6 +54,7 @@ public class LawyerService {
         lawyerRepository.save(lawyer);
     }
 
+    @Transactional
     public void updateLawyer(Long id, Lawyer updatedData, List<Long> categoryIds) {
         validatePhoneNumber(updatedData.getPhone());
         Lawyer existing = lawyerRepository.findById(id)
