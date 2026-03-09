@@ -3,7 +3,7 @@
 <head>
     <title>Вхід</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css?v=1}" rel="stylesheet">
 </head>
 <body class="container mt-5">
 <div class="row justify-content-center">
@@ -25,18 +25,25 @@
                 <input type="email" name="email" class="form-control" required autofocus/>
             </div>
             <div class="mb-3">
-                <label>Пароль:</label>
-                <input type="password" name="password" class="form-control" required/>
+                <label class="form-label">Пароль:</label>
+                <div class="input-group">
+                    <input type="password" name="password" id="loginPassword" class="form-control" required/>
+                    <button class="btn btn-outline-secondary toggle-password" type="button" data-target="loginPassword">
+                        👁️
+                    </button>
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Увійти</button>
+            <div class="d-grid gap-2 mt-4">
+                <button type="submit" class="btn btn-primary">Увійти</button>
+                <a th:href="@{/}" class="btn btn-outline-secondary">Повернутися на головну</a>
+            </div>
         </form>
 
-        <div class="text-center mt-3">
-            <a th:href="@{/register}">Немає акаунту? Зареєструватися</a>
+        <div class="text-center mt-4">
+            <a th:href="@{/register}" class="text-decoration-none">Немає акаунту? Зареєструватися</a>
         </div>
-        <a th:href="@{/}" class="btn btn-primary mt-3">🔙 Повернутися на головну</a>
     </div>
+    <script th:src="@{/js/script.js}"></script>
 </div>
-<script th:src="@{/js/script.js}"></script>
 </body>
 </html>
