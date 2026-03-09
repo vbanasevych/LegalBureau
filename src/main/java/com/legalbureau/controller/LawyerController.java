@@ -3,6 +3,7 @@ package com.legalbureau.controller;
 import com.legalbureau.entity.CaseService;
 import com.legalbureau.entity.Hearing;
 import com.legalbureau.entity.User;
+import com.legalbureau.entity.enums.CaseResult;
 import com.legalbureau.entity.enums.Role;
 import com.legalbureau.exception.DuplicateResourceException;
 import com.legalbureau.security.CustomUserDetails;
@@ -77,6 +78,18 @@ public class LawyerController {
     @PostMapping("/cases/{id}/status")
     public String updateStatus(@PathVariable Long id, @RequestParam CaseStatus status) {
         caseService.updateStatus(id, status);
+        return "redirect:/lawyer/cases/" + id;
+    }
+
+    @PostMapping("/cases/{id}/result")
+    public String updateResult(@PathVariable Long id,
+                               @RequestParam(required = false) CaseResult result,
+                               @AuthenticationPrincipal CustomUserDetails userDetails,
+                               RedirectAttributes redirectAttributes) {
+        Long lawyerId = userDetails.getUser().getId();
+        caseService.updateCaseResult(id, result, lawyerId);
+
+        redirectAttributes.addFlashAttribute("success", "Результат справи успішно збережено!");
         return "redirect:/lawyer/cases/" + id;
     }
 

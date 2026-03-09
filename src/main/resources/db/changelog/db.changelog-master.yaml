@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changeset/04-add-user-active-status.sql
   - include:
       file: db/changelog/changeset/05-unlink-cases.sql
+  - include:
+      file: db/changelog/changeset/06-add-case-result.sql

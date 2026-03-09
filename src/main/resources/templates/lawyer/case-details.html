@@ -48,6 +48,19 @@
                 <button type="submit" class="btn btn-warning">Зберегти статус</button>
             </form>
         </div>
+        <div class="mt-4 p-3 bg-white shadow-sm rounded border border-success">
+            <form th:action="@{/lawyer/cases/{id}/result(id=${legalCase.id})}" method="post" class="d-flex align-items-center">
+                <label class="me-3 fw-bold mb-0 text-success">🏆 Результат справи:</label>
+                <select name="result" class="form-select w-auto me-3">
+                    <option value="">-- В процесі (Не визначено) --</option>
+                    <option th:each="res : ${T(com.legalbureau.entity.enums.CaseResult).values()}"
+                            th:value="${res.name()}"
+                            th:text="${res.displayValue}"
+                            th:selected="${res == legalCase.result}"></option>
+                </select>
+                <button type="submit" class="btn btn-success">Зберегти результат</button>
+            </form>
+        </div>
 
         <div th:if="${legalCase.status.name() == 'IN_PROGRESS'}" class="alert alert-info mt-4 mb-0">
             <hr>

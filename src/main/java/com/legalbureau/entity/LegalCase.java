@@ -1,12 +1,12 @@
 package com.legalbureau.entity;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import com.legalbureau.entity.enums.CaseStatus;
 import java.time.LocalDateTime;
 import java.util.List;
+import com.legalbureau.entity.enums.CaseResult;
 
 @Entity
 @Table(name = "legal_cases")
@@ -50,4 +50,8 @@ public class LegalCase extends BaseEntity {
 
     @OneToMany(mappedBy = "legalCase", cascade = CascadeType.ALL)
     private List<Hearing> hearings;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "result")
+    private CaseResult result;
 }

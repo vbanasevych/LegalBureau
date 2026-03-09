@@ -25,7 +25,7 @@ public interface LegalCaseRepository extends JpaRepository<LegalCase, Long> {
             "AND (:status IS NULL OR c.status = :status) " +
             "ORDER BY c.createdAt DESC")
     Page<LegalCase> findAllFilteredPublic(@Param("categoryId") Long categoryId,
-                                          @Param("status") com.legalbureau.entity.enums.CaseStatus status,
+                                          @Param("status") CaseStatus status,
                                           Pageable pageable);
 
     @Query("SELECT c FROM LegalCase c WHERE c.lawyer.id = :lawyerId " +
@@ -36,7 +36,7 @@ public interface LegalCaseRepository extends JpaRepository<LegalCase, Long> {
     Page<LegalCase> findFilteredByLawyerId(@Param("lawyerId") Long lawyerId,
                                            @Param("caseNumber") String caseNumber,
                                            @Param("categoryId") Long categoryId,
-                                           @Param("status") com.legalbureau.entity.enums.CaseStatus status,
+                                           @Param("status") CaseStatus status,
                                            Pageable pageable);
 
     @Query("SELECT c FROM LegalCase c WHERE c.client.id = :clientId " +
@@ -52,8 +52,14 @@ public interface LegalCaseRepository extends JpaRepository<LegalCase, Long> {
             "(:caseNumber IS NULL OR LOWER(c.caseNumber) LIKE :caseNumber) AND " +
             "(:categoryId IS NULL OR c.category.id = :categoryId) AND " +
             "(:status IS NULL OR c.status = :status) ORDER BY c.createdAt DESC")
-    org.springframework.data.domain.Page<LegalCase> findAllFilteredForAdmin(@Param("caseNumber") String caseNumber,
+   Page<LegalCase> findAllFilteredForAdmin(@Param("caseNumber") String caseNumber,
                                                                             @Param("categoryId") Long categoryId,
-                                                                            @Param("status") com.legalbureau.entity.enums.CaseStatus status,
+                                                                            @Param("status") CaseStatus status,
                                                                             Pageable pageable);
+
+    @Query("SELECT c.category.name, COUNT(c) FROM LegalCase c GROUP BY c.category.name")
+    java.util.List<Object[]> countCasesByCategory();
+
+    @Query("SELECT c.result, COUNT(c) FROM LegalCase c WHERE c.result IS NOT NULL GROUP BY c.result")
+    java.util.List<Object[]> countCasesByResult();
 }

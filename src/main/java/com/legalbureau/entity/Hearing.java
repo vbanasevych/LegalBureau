@@ -32,9 +32,6 @@ public class Hearing {
     @Column(length = 255)
     private String place;
 
-    @Column(length = 255)
-    private String result;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "legal_case_id", nullable = false)
     private LegalCase legalCase;

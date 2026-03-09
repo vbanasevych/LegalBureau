@@ -3,6 +3,7 @@ package com.legalbureau.service;
 import com.legalbureau.entity.CaseService;
 import com.legalbureau.entity.LegalCase;
 import com.legalbureau.entity.enums.CaseStatus;
+import com.legalbureau.entity.enums.Role;
 import com.legalbureau.repository.CaseServiceRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class CaseServiceManager {
 
     @Transactional
     public void addServiceToCase(Long caseId, CaseService item, Long lawyerId) {
-        LegalCase legalCase = legalCaseService.getCaseDetailsWithPrivacy(caseId, lawyerId, com.legalbureau.entity.enums.Role.LAWYER);
+        LegalCase legalCase = legalCaseService.getCaseDetailsWithPrivacy(caseId, lawyerId, Role.LAWYER);
 
         if (legalCase.getStatus() == CaseStatus.NEW || legalCase.getStatus() == CaseStatus.DECLINED) {
             throw new IllegalArgumentException("Неможливо додати послугу до неактивної справи");

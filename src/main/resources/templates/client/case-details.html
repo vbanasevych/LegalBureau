@@ -11,6 +11,9 @@
         <h4 class="mb-0" th:text="'Справа: ' + ${legalCase.caseNumber}"></h4>
         <span class="badge bg-light text-dark fs-6" th:text="${legalCase.status.displayValue}"></span>
     </div>
+    <div th:if="${legalCase.result != null}" class="alert alert-success mt-3 shadow-sm">
+        <strong>🏆 Результат справи:</strong> <span th:text="${legalCase.result.displayValue}"></span>
+    </div>
     <div class="card-body">
         <p><strong>Клієнт:</strong> <span th:text="${legalCase.client.fullName}"></span></p>
         <p><strong>Адвокат:</strong> <span th:text="${legalCase.lawyer.fullName}"></span></p>

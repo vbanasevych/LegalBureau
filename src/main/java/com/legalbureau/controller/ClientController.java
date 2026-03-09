@@ -2,6 +2,7 @@ package com.legalbureau.controller;
 
 import com.legalbureau.entity.Lawyer;
 import com.legalbureau.entity.enums.CaseStatus;
+import com.legalbureau.entity.enums.Role;
 import com.legalbureau.service.*;
 import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.LegalCase;
@@ -50,7 +51,7 @@ public class ClientController {
     @GetMapping("/cases/{id}")
     public String showCaseDetails(@PathVariable Long id, Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
         Long currentUserId = userDetails.getUser().getId();
-        com.legalbureau.entity.enums.Role currentUserRole = userDetails.getUser().getRole();
+        Role currentUserRole = userDetails.getUser().getRole();
 
         LegalCase secureCase = caseService.getCaseDetailsWithPrivacy(id, currentUserId, currentUserRole);
 

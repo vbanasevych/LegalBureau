@@ -1,6 +1,7 @@
 package com.legalbureau.service;
 
 
+import com.legalbureau.entity.enums.CaseResult;
 import com.legalbureau.entity.enums.Role;
 import com.legalbureau.exception.DuplicateResourceException;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +81,14 @@ public class LegalCaseService {
         caseRepository.save(legalCase);
     }
 
+    @Transactional
+    public void updateCaseResult(Long caseId, CaseResult result, Long lawyerId) {
+        LegalCase legalCase = getCaseDetailsWithPrivacy(caseId, lawyerId, Role.LAWYER);
+
+        legalCase.setResult(result);
+        caseRepository.save(legalCase);
+    }
+
     public LegalCase getCaseDetailsWithPrivacy(Long caseId, Long currentUserId, Role currentUserRole) {
         LegalCase legalCase = findById(caseId);
 
@@ -147,9 +156,9 @@ public class LegalCaseService {
 
     @Transactional
     public void cancelCaseByClient(Long caseId, Long clientId) {
-        LegalCase legalCase = getCaseDetailsWithPrivacy(caseId, clientId, com.legalbureau.entity.enums.Role.CLIENT);
+        LegalCase legalCase = getCaseDetailsWithPrivacy(caseId, clientId, Role.CLIENT);
 
-        if (legalCase.getStatus() != com.legalbureau.entity.enums.CaseStatus.NEW) {
+        if (legalCase.getStatus() != CaseStatus.NEW) {
             throw new IllegalStateException("Ви можете скасувати лише нові запити, які ще не прийняті в роботу.");
         }
 
@@ -162,9 +171,9 @@ public class LegalCaseService {
         for (LegalCase c : cases) {
             c.setLawyer(null);
 
-            if (c.getStatus() == com.legalbureau.entity.enums.CaseStatus.IN_PROGRESS ||
-                    c.getStatus() == com.legalbureau.entity.enums.CaseStatus.ACCEPTED) {
-                c.setStatus(com.legalbureau.entity.enums.CaseStatus.NEW);
+            if (c.getStatus() == CaseStatus.IN_PROGRESS ||
+                    c.getStatus() == CaseStatus.ACCEPTED) {
+                c.setStatus(CaseStatus.NEW);
             }
             caseRepository.save(c);
         }
