@@ -51,6 +51,8 @@
                     <tr th:each="cat : ${categoryPage.content}">
                         <td class="fw-bold" th:text="${cat.name}"></td>
                         <td class="text-center">
+                            <a th:href="@{/admin/categories/{id}/edit(id=${cat.id})}" class="btn btn-sm btn-primary"
+                               title="Редагувати">✏️</a>
                             <a th:href="@{/admin/categories/delete/{id}(id=${cat.id})}" class="btn btn-sm btn-danger"
                                onclick="return confirm('Ви впевнені?');">🗑</a>
                         </td>

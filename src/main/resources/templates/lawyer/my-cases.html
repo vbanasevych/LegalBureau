@@ -61,7 +61,6 @@
         <tr th:each="c : ${casePage.content}">
             <td class="fw-bold text-primary" th:text="${c.caseNumber}"></td>
             <td>
-            <td>
                 <div th:text="${c.client != null ? c.client.fullName : 'Видалений клієнт'}"></div>
                 <small class="text-muted" th:text="${c.client != null ? c.client.phone : '-'}"></small>
             </td>

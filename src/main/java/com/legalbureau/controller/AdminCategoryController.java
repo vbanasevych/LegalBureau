@@ -38,6 +38,24 @@ public class AdminCategoryController {
         return "redirect:/admin/categories";
     }
 
+    @GetMapping("/{id}/edit")
+    public String editCategoryForm(@PathVariable Long id, org.springframework.ui.Model model) {
+        model.addAttribute("category", categoryService.findById(id));
+        return "admin/categories/edit";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String updateCategory(@PathVariable Long id, @ModelAttribute CaseCategory category, RedirectAttributes redirectAttributes) {
+        try {
+            categoryService.update(id, category);
+            redirectAttributes.addFlashAttribute("success", "Категорію успішно оновлено!");
+            return "redirect:/admin/categories";
+        } catch (DuplicateResourceException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/admin/categories/" + id + "/edit";
+        }
+    }
+
     @GetMapping("/delete/{id}")
     public String deleteCategory(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {

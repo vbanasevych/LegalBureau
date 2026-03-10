@@ -47,35 +47,38 @@
         </div>
     </form>
 
-    <table class="table table-bordered mt-3">
-        <thead class="table-dark">
-        <tr>
-            <th>Номер</th>
-            <th>Клієнт</th>
-            <th>Адвокат</th>
-            <th>Категорія</th>
-            <th>Статус</th>
-            <th class="text-center">Дії</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="c : ${casePage.content}">
-            <td th:text="${c.caseNumber}"></td>
-            <td th:text="${c.client != null ? c.client.fullName : 'Видалений клієнт'}"></td>
-            <td th:text="${c.lawyer != null ? c.lawyer.fullName : 'Немає'}"></td>
-            <td th:text="${c.category.name}"></td>
-            <td><span class="badge bg-secondary" th:text="${c.status.displayValue}"></span></td>
-            <td class="text-center">
-                <a th:href="@{/admin/cases/edit/{id}(id=${c.id})}" class="btn btn-sm btn-primary">Редагувати</a>
-                <a th:href="@{/admin/cases/delete/{id}(id=${c.id})}" class="btn btn-sm btn-danger"
-                   onclick="return confirm('Видалити цю справу назавжди?');">Видалити</a>
-            </td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(casePage.content)}">
-            <td colspan="6" class="text-center text-muted py-4">Справ ще немає.</td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="table-responsive shadow-sm rounded bg-white">
+        <table class="table table-hover align-middle mb-0 border">
+            <thead class="table-dark">
+            <tr>
+                <th>Номер</th>
+                <th>Клієнт</th>
+                <th>Адвокат</th>
+                <th>Категорія</th>
+                <th>Статус</th>
+                <th class="text-center">Дії</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${casePage.content}">
+                <td class="fw-bold" th:text="${c.caseNumber}"></td>
+                <td th:text="${c.client != null ? c.client.fullName : 'Видалений клієнт'}"></td>
+                <td th:text="${c.lawyer != null ? c.lawyer.fullName : 'Немає'}"></td>
+                <td th:text="${c.category.name}"></td>
+                <td><span class="badge bg-secondary" th:text="${c.status.displayValue}"></span></td>
+                <td class="text-center d-flex justify-content-center gap-1">
+                    <a th:href="@{/admin/cases/edit/{id}(id=${c.id})}" class="btn btn-sm btn-primary" title="Редагувати">✏️</a>
+                    <a th:href="@{/admin/cases/delete/{id}(id=${c.id})}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Видалити цю справу назавжди?');" title="Видалити">🗑</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(casePage.content)}">
+                <td colspan="6" class="text-center text-muted py-4">Справ ще немає.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
     <nav th:if="${casePage.totalPages > 1}" class="mt-4">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${casePage.first ? 'disabled' : ''}">

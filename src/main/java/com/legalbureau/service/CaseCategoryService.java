@@ -44,6 +44,18 @@ public class CaseCategoryService {
     }
 
     @Transactional
+    public void update(Long id, CaseCategory updatedCategory) {
+        CaseCategory existing = findById(id);
+
+        if (!existing.getName().equals(updatedCategory.getName()) && repository.existsByName(updatedCategory.getName())) {
+            throw new DuplicateResourceException("Категорія з назвою '" + updatedCategory.getName() + "' вже існує");
+        }
+
+        existing.setName(updatedCategory.getName());
+        repository.save(existing);
+    }
+
+    @Transactional
     public void delete(Long id) {
         if (!repository.existsById(id)) {
             throw new ResourceNotFoundException("Категорію не знайдено");

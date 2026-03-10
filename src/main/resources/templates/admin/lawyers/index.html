@@ -35,7 +35,8 @@
         <div class="col-md-4 d-grid gap-2 d-md-flex">
             <select name="categoryId" class="form-select">
                 <option value="">Усі спеціалізації</option>
-                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${cat.id == searchCategoryId}"></option>
+                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"
+                        th:selected="${cat.id == searchCategoryId}"></option>
             </select>
         </div>
         <div class="col-md-3 d-grid gap-2 d-md-flex">
@@ -44,61 +45,69 @@
         </div>
     </form>
 
-    <table class="table table-bordered table-striped mt-3">
-        <thead class="table-dark">
-        <tr>
-            <th>ПІБ</th>
-            <th>Email</th>
-            <th>Місто</th>
-            <th>Ставка (грн/год)</th>
-            <th>Спеціалізації</th>
-            <th>Статус</th>
-            <th class="text-center">Дії</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="lawyer : ${lawyerPage.content}">
-            <td class="fw-bold" th:text="${lawyer.fullName}"></td>
-            <td th:text="${lawyer.email}"></td>
-            <td th:text="${lawyer.city}"></td>
-            <td th:text="${lawyer.hourlyRate}"></td>
-            <td>
+    <div class="table-responsive shadow-sm rounded bg-white">
+        <table class="table table-hover align-middle mb-0 border">
+            <thead class="table-dark">
+            <tr>
+                <th>ПІБ</th>
+                <th>Email</th>
+                <th>Місто</th>
+                <th>Ставка (грн/год)</th>
+                <th>Спеціалізації</th>
+                <th>Статус</th>
+                <th class="text-center">Дії</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="lawyer : ${lawyerPage.content}">
+                <td class="fw-bold" th:text="${lawyer.fullName}"></td>
+                <td th:text="${lawyer.email}"></td>
+                <td th:text="${lawyer.city}"></td>
+                <td th:text="${lawyer.hourlyRate}"></td>
+                <td>
             <span th:each="cat, stat : ${lawyer.specializations}"
                   th:text="${cat.name} + ${!stat.last ? ', ' : ''}"></span>
-                <span th:if="${#lists.isEmpty(lawyer.specializations)}" class="text-muted">Не вказано</span>
-            </td>
-            <td>
-                <span th:if="${lawyer.active}" class="badge bg-success">Активний</span>
-                <span th:unless="${lawyer.active}" class="badge bg-danger">Заблокований</span>
-            </td>
-            <td class="text-center d-flex justify-content-center gap-1">
-                <a th:href="@{/admin/lawyers/edit/{id}(id=${lawyer.id})}" class="btn btn-sm btn-primary"
-                   title="Редагувати">✏️</a>
-                <form th:action="@{/admin/lawyers/toggle-status/{id}(id=${lawyer.id})}" method="post">
-                    <button type="submit" class="btn btn-sm"
-                            th:classappend="${lawyer.active ? 'btn-warning' : 'btn-success'}"
-                            th:title="${lawyer.active ? 'Заблокувати' : 'Розблокувати'}"
-                            th:text="${lawyer.active ? '🔒' : '🔓'}"></button>
-                </form>
-                <a th:href="@{/admin/lawyers/delete/{id}(id=${lawyer.id})}" class="btn btn-sm btn-danger"
-                   onclick="return confirm('Ви впевнені, що хочете видалити цього адвоката?');" title="Видалити">🗑</a>
-            </td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(lawyerPage.content)}">
-            <td colspan="6" class="text-center text-muted py-4">Адвокатів ще немає.</td>
-        </tr>
-        </tbody>
-    </table>
+                    <span th:if="${#lists.isEmpty(lawyer.specializations)}" class="text-muted">Не вказано</span>
+                </td>
+                <td>
+                    <span th:if="${lawyer.active}" class="badge bg-success">Активний</span>
+                    <span th:unless="${lawyer.active}" class="badge bg-danger">Заблокований</span>
+                </td>
+                <td class="text-center d-flex justify-content-center gap-1">
+                    <a th:href="@{/admin/lawyers/edit/{id}(id=${lawyer.id})}" class="btn btn-sm btn-primary"
+                       title="Редагувати">✏️</a>
+                    <form th:action="@{/admin/lawyers/toggle-status/{id}(id=${lawyer.id})}" method="post">
+                        <button type="submit" class="btn btn-sm"
+                                th:classappend="${lawyer.active ? 'btn-warning' : 'btn-success'}"
+                                th:title="${lawyer.active ? 'Заблокувати' : 'Розблокувати'}"
+                                th:text="${lawyer.active ? '🔒' : '🔓'}"></button>
+                    </form>
+                    <a th:href="@{/admin/lawyers/delete/{id}(id=${lawyer.id})}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Ви впевнені, що хочете видалити цього адвоката?');"
+                       title="Видалити">🗑</a>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(lawyerPage.content)}">
+                <td colspan="6" class="text-center text-muted py-4">Адвокатів ще немає.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
     <nav th:if="${lawyerPage.totalPages > 1}" class="mt-4">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${lawyerPage.first ? 'disabled' : ''}">
-                <a class="page-link" th:href="@{/admin/lawyers(page=${lawyerPage.number - 1}, name=${searchName}, categoryId=${searchCategoryId})}">Попередня</a>
+                <a class="page-link"
+                   th:href="@{/admin/lawyers(page=${lawyerPage.number - 1}, name=${searchName}, categoryId=${searchCategoryId})}">Попередня</a>
             </li>
-            <li class="page-item" th:each="i : ${#numbers.sequence(0, lawyerPage.totalPages - 1)}" th:classappend="${lawyerPage.number == i ? 'active' : ''}">
-                <a class="page-link" th:href="@{/admin/lawyers(page=${i}, name=${searchName}, categoryId=${searchCategoryId})}" th:text="${i + 1}"></a>
+            <li class="page-item" th:each="i : ${#numbers.sequence(0, lawyerPage.totalPages - 1)}"
+                th:classappend="${lawyerPage.number == i ? 'active' : ''}">
+                <a class="page-link"
+                   th:href="@{/admin/lawyers(page=${i}, name=${searchName}, categoryId=${searchCategoryId})}"
+                   th:text="${i + 1}"></a>
             </li>
             <li class="page-item" th:classappend="${lawyerPage.last ? 'disabled' : ''}">
-                <a class="page-link" th:href="@{/admin/lawyers(page=${lawyerPage.number + 1}, name=${searchName}, categoryId=${searchCategoryId})}">Наступна</a>
+                <a class="page-link"
+                   th:href="@{/admin/lawyers(page=${lawyerPage.number + 1}, name=${searchName}, categoryId=${searchCategoryId})}">Наступна</a>
             </li>
         </ul>
     </nav>
