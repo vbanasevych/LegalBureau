@@ -19,13 +19,19 @@
         <input type="email" th:field="*{email}" class="form-control" required/>
     </div>
     <div class="mb-3">
-        <label class="form-label">Пароль:</label>
+        <label>Пароль:</label>
         <div class="input-group">
-            <input type="password" th:field="*{passwordHash}" id="registerPassword" class="form-control" required/>
+            <input type="password" name="passwordHash" id="registerPassword" class="form-control" required/>
             <button class="btn btn-outline-secondary toggle-password" type="button" data-target="registerPassword">
                 👁️
             </button>
         </div>
+
+        <ul class="list-unstyled mt-2 small">
+            <li id="req-length" class="text-danger">❌ Від 8 до 20 символів</li>
+            <li id="req-digit" class="text-danger">❌ Мінімум одна цифра</li>
+            <li id="req-spec" class="text-danger">❌ Мінімум один спецсимвол (! _ @ # $ % ^ & *)</li>
+        </ul>
     </div>
     <div class="mb-3">
         <label>Телефон:</label>
@@ -34,7 +40,7 @@
                pattern="\+380-[0-9]{3}-[0-9]{3}-[0-9]{3}"
                title="Формат номеру має бути: +380-XXX-XXX-XXX" required/>
     </div>
-    <button type="submit" class="btn btn-primary">Зареєструватися</button>
+    <button type="submit" id="submitBtn" class="btn btn-primary">Зареєструватися</button>
     <a th:href="@{/}" class="btn btn-primary">🔙 Повернутися на головну</a>
 </form>
 <script th:src="@{/js/script.js}"></script>

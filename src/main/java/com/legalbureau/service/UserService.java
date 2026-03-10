@@ -30,6 +30,8 @@ public class UserService {
     @Transactional
     public void registerClient(User user) {
         validatePhoneNumber(user.getPhone());
+        validatePassword(user.getPasswordHash());
+
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new DuplicateResourceException("Користувач з email " + user.getEmail() + " вже існує");
         }
@@ -103,6 +105,21 @@ public class UserService {
     private void validatePhoneNumber(String phone) {
         if (phone == null || !phone.matches("^\\+380-\\d{3}-\\d{3}-\\d{3}$")) {
             throw new IllegalArgumentException("Невірний формат телефону! Використовуйте: +380-XXX-XXX-XXX");
+        }
+    }
+
+    private void validatePassword(String password) {
+        if (password == null || password.isEmpty()) {
+            throw new IllegalArgumentException("Пароль не може бути порожнім.");
+        }
+        if (password.length() < 8 || password.length() > 20) {
+            throw new IllegalArgumentException("Пароль повинен містити від 8 до 20 символів.");
+        }
+        if (!password.matches(".*\\d.*")) {
+            throw new IllegalArgumentException("Пароль повинен містити хоча б одну цифру.");
+        }
+        if (!password.matches(".*[!_@#$%^&*()+=^.\\-].*")) {
+            throw new IllegalArgumentException("Пароль повинен містити хоча б один спецсимвол (! _ @ # $ % ^ & * і т.д.).");
         }
     }
 }
