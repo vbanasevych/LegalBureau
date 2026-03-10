@@ -9,12 +9,21 @@
 <div class="row justify-content-center">
     <div class="col-md-4">
         <h3 class="text-center mb-4">Вхід у систему</h3>
+        <div th:if="${param.expired}" class="alert alert-warning text-center shadow-sm">
+            ⚠️ Ваш сеанс примусово завершено. Акаунт було заблоковано або видалено адміністратором.
+        </div>
+
+        <div th:if="${param.error}" class="alert alert-danger text-center shadow-sm">
+            <span th:if="${session.SPRING_SECURITY_LAST_EXCEPTION != null and session.SPRING_SECURITY_LAST_EXCEPTION.class.name == 'org.springframework.security.authentication.DisabledException'}">
+                ⛔ Ваш акаунт заблоковано. Зверніться до підтримки.
+            </span>
+            <span th:unless="${session.SPRING_SECURITY_LAST_EXCEPTION != null and session.SPRING_SECURITY_LAST_EXCEPTION.class.name == 'org.springframework.security.authentication.DisabledException'}">
+                ❌ Невірний email або пароль.
+            </span>
+        </div>
 
         <div th:if="${info}" class="alert alert-info text-center shadow-sm" th:text="${info}"></div>
 
-        <div th:if="${param.error}" class="alert alert-danger">
-            Невірний email або пароль.
-        </div>
         <div th:if="${param.logout}" class="alert alert-success">
             Ви успішно вийшли з системи.
         </div>

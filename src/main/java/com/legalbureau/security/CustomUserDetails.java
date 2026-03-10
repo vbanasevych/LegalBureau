@@ -1,5 +1,6 @@
 package com.legalbureau.security;
 
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -10,6 +11,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 @RequiredArgsConstructor
+@EqualsAndHashCode
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
@@ -36,11 +38,11 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isAccountNonExpired() { return true; }
     @Override
-    public boolean isAccountNonLocked() {
-        return user.isActive();
-    }
+    public boolean isAccountNonLocked() { return true; }
     @Override
     public boolean isCredentialsNonExpired() { return true; }
     @Override
-    public boolean isEnabled() { return true; }
+    public boolean isEnabled() {
+        return user.isActive();
+    }
 }

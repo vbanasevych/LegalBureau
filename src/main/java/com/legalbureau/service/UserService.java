@@ -22,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserSessionService sessionService;
 
     public java.util.Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -91,14 +92,19 @@ public class UserService {
     public User toggleUserStatus(Long id) {
         User user = findById(id);
         user.setActive(!user.isActive());
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        if (!savedUser.isActive()) {
+            sessionService.kickUserByEmail(savedUser.getEmail());
+        }
+        return savedUser;
     }
 
     @Transactional
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("Користувача не знайдено");
-        }
+        User user = findById(id);
+        sessionService.kickUserByEmail(user.getEmail());
+
         userRepository.deleteById(id);
     }
 

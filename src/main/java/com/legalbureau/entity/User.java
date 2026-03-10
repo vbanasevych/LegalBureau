@@ -23,7 +23,7 @@ public class User extends BaseEntity {
     @Column(name = "full_name")
     private String fullName;
 
-    @Pattern(regexp = "^\\d{4}-\\d{3}-\\d{3}-\\d{4}$", message = "Не правильний формат номеру")
+    @Column(name = "phone")
     private String phone;
 
     @Enumerated(EnumType.STRING)
