@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changeset/05-unlink-cases.sql
   - include:
       file: db/changelog/changeset/06-add-case-result.sql
+  - include:
+      file: db/changelog/changeset/07-add-tokens-table.sql

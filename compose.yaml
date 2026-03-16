@@ -29,5 +29,8 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_JPA_SHOW_SQL: "true"
 
+      MAIL_NAME: ${MAIL_NAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+
 volumes:
   pgdata:
