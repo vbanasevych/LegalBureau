@@ -30,6 +30,7 @@ public class LawyerController {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final HearingService hearingService;
+    private final InvoiceService invoiceService;
 
     @GetMapping("/my-cases")
     public String myCases(
@@ -70,9 +71,17 @@ public class LawyerController {
         model.addAttribute("newServiceItem", new CaseService());
 
         model.addAttribute("hearings", hearingService.getHearingsByCase(id));
-
         model.addAttribute("newHearing", new Hearing());
+
+        model.addAttribute("invoice", invoiceService.getInvoiceByCaseId(id));
+
         return "lawyer/case-details";
+    }
+
+    @PostMapping("/cases/{id}/invoice/toggle-payment")
+    public String toggleInvoicePayment(@PathVariable Long id) {
+        invoiceService.togglePaymentStatus(id);
+        return "redirect:/lawyer/cases/" + id;
     }
 
     @PostMapping("/cases/{id}/status")
@@ -96,9 +105,16 @@ public class LawyerController {
     @PostMapping("/cases/{id}/services")
     public String addServiceItem(@PathVariable Long id,
                                  @ModelAttribute("newServiceItem") CaseService newServiceItem,
-                                 @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long lawyerId = userDetails.getUser().getId();
-        caseServiceManager.addServiceToCase(id, newServiceItem, lawyerId);
+                                 @AuthenticationPrincipal CustomUserDetails userDetails,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            Long lawyerId = userDetails.getUser().getId();
+            caseServiceManager.addServiceToCase(id, newServiceItem, lawyerId);
+            redirectAttributes.addFlashAttribute("success", "Послугу успішно додано!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
         return "redirect:/lawyer/cases/" + id;
     }
 

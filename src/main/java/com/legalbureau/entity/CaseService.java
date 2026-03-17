@@ -1,6 +1,7 @@
 package com.legalbureau.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ public class CaseService extends BaseEntity {
     private String name;
 
     @Column(nullable = false)
+    @Min(0)
     private BigDecimal price;
 
     @Column(name = "date_added", insertable = false, updatable = false)

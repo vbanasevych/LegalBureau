@@ -34,6 +34,8 @@ public class LegalCaseService {
     private final UserRepository userRepository;
     private final LawyerRepository lawyerRepository;
     private final CaseCategoryRepository categoryRepository;
+    private final InvoiceService invoiceService;
+    private final LegalCaseRepository legalCaseRepository;
 
     public List<LegalCase> findAll() {
         return caseRepository.findAll();
@@ -75,6 +77,10 @@ public class LegalCaseService {
 
         if (newStatus == CaseStatus.COMPLETED || newStatus == CaseStatus.DECLINED) {
             legalCase.setFinishedAt(LocalDateTime.now());
+        }
+
+        if (newStatus == CaseStatus.COMPLETED) {
+            invoiceService.generateInvoiceForCase(legalCase);
         }
 
         legalCase.setEditedAt(LocalDateTime.now());

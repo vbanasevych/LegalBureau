@@ -2,6 +2,7 @@ package com.legalbureau.entity;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
@@ -16,6 +17,7 @@ import java.util.Set;
 public class Lawyer extends User {
 
     @Column(name = "hourly_rate")
+    @Min(0)
     private BigDecimal hourlyRate;
 
     private String city;
