@@ -13,3 +13,5 @@ databaseChangeLog:
       file: db/changelog/changeset/06-add-case-result.sql
   - include:
       file: db/changelog/changeset/07-add-tokens-table.sql
+  - include:
+      file: db/changelog/changeset/08-add-verification-tokens.sql

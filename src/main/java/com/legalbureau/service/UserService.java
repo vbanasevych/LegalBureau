@@ -1,6 +1,10 @@
 package com.legalbureau.service;
 
+import com.legalbureau.entity.VerificationToken;
 import com.legalbureau.entity.enums.Role;
+import com.legalbureau.repository.VerificationTokenRepository;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.User;
@@ -12,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,13 +28,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserSessionService sessionService;
+    private final VerificationTokenRepository verificationTokenRepository;
+    private final JavaMailSender mailSender;
+    private final SimpleMailMessage messageTemplate = new SimpleMailMessage();
 
     public java.util.Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
     }
 
     @Transactional
-    public void registerClient(User user) {
+    public void registerClient(User user, String appUrl) {
         validatePhoneNumber(user.getPhone());
         validatePassword(user.getPasswordHash());
 
@@ -37,8 +45,37 @@ public class UserService {
             throw new DuplicateResourceException("Користувач з email " + user.getEmail() + " вже існує");
         }
         user.setRole(Role.CLIENT);
+        user.setActive(false);
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        String token = java.util.UUID.randomUUID().toString();
+        VerificationToken vToken = new VerificationToken();
+        vToken.setToken(token);
+        vToken.setUser(savedUser);
+        vToken.setExpiryDate(LocalDateTime.now().plusHours(24));
+        verificationTokenRepository.save(vToken);
+
+        String verifyUrl = appUrl + "/verify-email?token=" + token;
+        org.springframework.mail.SimpleMailMessage message = new org.springframework.mail.SimpleMailMessage();
+        message.setTo(savedUser.getEmail());
+        message.setSubject("Підтвердження реєстрації - Юридичне Бюро");
+        message.setText("Вітаємо!\n\nДля завершення реєстрації та активації вашого акаунту перейдіть за посиланням (діє 24 години):\n\n" + verifyUrl);
+        mailSender.send(message);
+    }
+
+    @Transactional
+    public boolean verifyUserEmail(String token) {
+        return verificationTokenRepository.findByToken(token).map(vToken -> {
+            if (vToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+                return false;
+            }
+            User user = vToken.getUser();
+            user.setActive(true);
+            userRepository.save(user);
+            verificationTokenRepository.delete(vToken);
+            return true;
+        }).orElse(false);
     }
 
     public List<User> findAllClients() {
@@ -128,4 +165,5 @@ public class UserService {
             throw new IllegalArgumentException("Пароль повинен містити хоча б один спецсимвол (! _ @ # $ % ^ & * і т.д.).");
         }
     }
+
 }

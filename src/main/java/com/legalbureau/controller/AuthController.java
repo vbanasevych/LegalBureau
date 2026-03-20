@@ -32,14 +32,28 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String registerClient(@ModelAttribute User user, Model model) {
+    public String registerClient(@ModelAttribute User user, Model model, jakarta.servlet.http.HttpServletRequest request, RedirectAttributes attributes) {
         try {
-            userService.registerClient(user);
+            String appUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+
+            userService.registerClient(user, appUrl);
+
+            attributes.addFlashAttribute("info", "Реєстрація майже завершена! На вашу пошту надіслано лист. Будь ласка, перейдіть за посиланням у листі для активації акаунту.");
             return "redirect:/login";
         } catch (DuplicateResourceException | IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "auth/register";
         }
+    }
+
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam String token, RedirectAttributes attributes) {
+        if (userService.verifyUserEmail(token)) {
+            attributes.addFlashAttribute("success", "Ваш акаунт успішно активовано! Тепер ви можете увійти.");
+        } else {
+            attributes.addFlashAttribute("error", "Посилання для підтвердження недійсне або прострочене.");
+        }
+        return "redirect:/login";
     }
 
     @GetMapping("/login-required")
