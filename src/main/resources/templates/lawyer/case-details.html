@@ -36,6 +36,10 @@
         <div class="bg-light p-3 rounded text-muted" th:text="${legalCase.description}"></div>
 
         <hr>
+
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
         <div class="bg-white p-3 border rounded">
             <h5 class="mb-3">Змінити статус справи:</h5>
             <form th:action="@{/lawyer/cases/{id}/status(id=${legalCase.id})}" method="post" class="d-flex align-items-center">
@@ -138,9 +142,6 @@
             <div th:if="${legalCase.status.name() == 'IN_PROGRESS' or legalCase.status.name() == 'ACCEPTED'}" class="mt-5">
                 <h5 class="text-primary">📅 Розклад по справі (Суди та Консультації)</h5>
                 <hr>
-
-                <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
-                <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
                 <div class="table-responsive shadow-sm rounded mb-4">
                     <table class="table table-bordered mb-0 bg-white">

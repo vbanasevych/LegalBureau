@@ -52,14 +52,14 @@ public interface LegalCaseRepository extends JpaRepository<LegalCase, Long> {
             "(:caseNumber IS NULL OR LOWER(c.caseNumber) LIKE :caseNumber) AND " +
             "(:categoryId IS NULL OR c.category.id = :categoryId) AND " +
             "(:status IS NULL OR c.status = :status) ORDER BY c.createdAt DESC")
-   Page<LegalCase> findAllFilteredForAdmin(@Param("caseNumber") String caseNumber,
-                                                                            @Param("categoryId") Long categoryId,
-                                                                            @Param("status") CaseStatus status,
-                                                                            Pageable pageable);
+    Page<LegalCase> findAllFilteredForAdmin(@Param("caseNumber") String caseNumber,
+                                            @Param("categoryId") Long categoryId,
+                                            @Param("status") CaseStatus status,
+                                            Pageable pageable);
 
     @Query("SELECT c.category.name, COUNT(c) FROM LegalCase c GROUP BY c.category.name")
-    java.util.List<Object[]> countCasesByCategory();
+    List<Object[]> countCasesByCategory();
 
     @Query("SELECT c.result, COUNT(c) FROM LegalCase c WHERE c.result IS NOT NULL GROUP BY c.result")
-    java.util.List<Object[]> countCasesByResult();
+    List<Object[]> countCasesByResult();
 }

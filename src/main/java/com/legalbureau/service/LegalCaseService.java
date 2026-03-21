@@ -1,6 +1,7 @@
 package com.legalbureau.service;
 
 
+import com.legalbureau.dto.ChartDataDto;
 import com.legalbureau.entity.enums.CaseResult;
 import com.legalbureau.entity.enums.Role;
 import com.legalbureau.exception.DuplicateResourceException;
@@ -193,5 +194,20 @@ public class LegalCaseService {
             c.setClient(null);
         }
         caseRepository.saveAll(cases);
+    }
+
+    public List<ChartDataDto> getCategoryStatistics() {
+        return caseRepository.countCasesByCategory().stream()
+                .map(row -> new ChartDataDto((String) row[0], (Long) row[1]))
+                .toList();
+    }
+
+    public List<ChartDataDto> getResultStatistics() {
+        return caseRepository.countCasesByResult().stream()
+                .map(row -> {
+                    CaseResult result = (CaseResult) row[0];
+                    return new ChartDataDto(result.getDisplayValue(), (Long) row[1]);
+                })
+                .toList();
     }
 }
