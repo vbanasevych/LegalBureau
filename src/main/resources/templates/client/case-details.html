@@ -9,7 +9,13 @@
 <div class="card w-75">
     <div class="card-header bg-dark text-white d-flex justify-content-between">
         <h4 class="mb-0" th:text="'Справа: ' + ${legalCase.caseNumber}"></h4>
-        <span class="badge bg-light text-dark fs-6" th:text="${legalCase.status.displayValue}"></span>
+        <div>
+            <a th:href="@{/client/cases/{id}/export(id=${legalCase.id})}" class="btn btn-sm btn-outline-light me-2">
+                📥 Завантажити досьє (Excel)
+            </a>
+
+            <span class="badge bg-light text-dark fs-6" th:text="${legalCase.status.displayValue}"></span>
+        </div>
     </div>
     <div th:if="${legalCase.result != null}" class="alert alert-success mt-3 shadow-sm">
         <strong>🏆 Результат справи:</strong> <span th:text="${legalCase.result.displayValue}"></span>

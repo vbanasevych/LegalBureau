@@ -14,7 +14,13 @@
 <div class="card shadow-sm border-0">
     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
         <h4 class="mb-0" th:text="'Справа: ' + ${legalCase.caseNumber}"></h4>
-        <span class="badge bg-light text-dark fs-6" th:text="${legalCase.status.displayValue}"></span>
+        <div>
+            <a th:href="@{/lawyer/cases/{id}/export(id=${legalCase.id})}" class="btn btn-sm btn-outline-light me-2">
+                📥 Завантажити досьє (Excel)
+            </a>
+
+            <span class="badge bg-light text-dark fs-6" th:text="${legalCase.status.displayValue}"></span>
+        </div>
     </div>
     <div class="card-body">
         <div class="row mb-3">

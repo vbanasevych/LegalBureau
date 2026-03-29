@@ -10,9 +10,32 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>💼 Мої справи</h2>
     <div>
+        <a th:href="@{/lawyer/cases/export}" class="btn btn-outline-success">📥 Експортувати всі в Excel</a>
         <a th:href="@{/lawyer/cases/create}" class="btn btn-success me-2">➕ Нова справа</a>
         <a th:href="@{/lawyer/clients/create}" class="btn btn-outline-success me-2">👤 Новий клієнт</a>
         <a th:href="@{/}" class="btn btn-secondary">На головну</a>
+    </div>
+</div>
+
+<div class="card shadow-sm border-success mb-4">
+    <div class="card-body">
+        <h6 class="card-title text-success">📤 Швидкий імпорт справ з Excel</h6>
+        <form th:action="@{/lawyer/cases/import}" method="post" enctype="multipart/form-data" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small">Email клієнта (має існувати):</label>
+                <input type="email" name="clientEmail" class="form-control" placeholder="client@gmail.com" required>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label small">Файл (.xlsx):</label>
+                <input type="file" name="file" class="form-control" accept=".xlsx" required>
+            </div>
+            <div class="col-md-3 d-grid">
+                <button type="submit" class="btn btn-success">Імпортувати</button>
+            </div>
+        </form>
+        <small class="text-muted mt-2 d-block">
+            * Формат таблиці: Колонки A (Номер справи), B (Категорія), C (Опис проблеми). Заголовок у першому рядку обов'язковий.
+        </small>
     </div>
 </div>
 

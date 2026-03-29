@@ -6,18 +6,25 @@ import com.legalbureau.entity.User;
 import com.legalbureau.entity.enums.CaseResult;
 import com.legalbureau.entity.enums.Role;
 import com.legalbureau.exception.DuplicateResourceException;
+import com.legalbureau.exception.ResourceNotFoundException;
 import com.legalbureau.security.CustomUserDetails;
 import com.legalbureau.service.*;
 import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.LegalCase;
 import com.legalbureau.entity.enums.CaseStatus;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/lawyer")
@@ -31,6 +38,7 @@ public class LawyerController {
     private final PasswordEncoder passwordEncoder;
     private final HearingService hearingService;
     private final InvoiceService invoiceService;
+    private final ExcelService excelService;
 
     @GetMapping("/my-cases")
     public String myCases(
@@ -199,5 +207,73 @@ public class LawyerController {
         }
 
         return "redirect:/lawyer/cases/" + id;
+    }
+
+    @GetMapping("/cases/export")
+    public ResponseEntity<byte[]> exportMyCases(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            Long lawyerId = userDetails.getUser().getId();
+            List<LegalCase> cases = caseService.getFilteredCasesForLawyer(lawyerId, null, null, null, 0, 1000).getContent();
+
+            byte[] excelData = excelService.exportCasesToExcel(cases);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"my_cases.xlsx\"")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(excelData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/cases/import")
+    public String importCases(@RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+                              @RequestParam("clientEmail") String clientEmail,
+                              @AuthenticationPrincipal CustomUserDetails userDetails,
+                              RedirectAttributes redirectAttributes) {
+        try {
+            Long lawyerId = userDetails.getUser().getId();
+            excelService.importCasesFromExcel(file, clientEmail, lawyerId);
+            redirectAttributes.addFlashAttribute("success", "Справи успішно імпортовано!");
+            return "redirect:/lawyer/my-cases";
+
+        } catch (ResourceNotFoundException e) {
+            if (e.getMessage().contains("не знайдено")) {
+                redirectAttributes.addFlashAttribute("error", "Клієнта з поштою " + clientEmail + " не знайдено. Будь ласка, зареєструйте його перед імпортом справ.");
+
+                redirectAttributes.addAttribute("email", clientEmail);
+
+                return "redirect:/lawyer/clients/create";
+            }
+
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/lawyer/my-cases";
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Помилка читання файлу. Переконайтеся, що це коректний Excel формат.");
+            return "redirect:/lawyer/my-cases";
+        }
+    }
+
+    @GetMapping("/cases/{id}/export")
+    public ResponseEntity<byte[]> exportSingleCaseLawyer(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            Long lawyerId = userDetails.getUser().getId();
+            Role role = userDetails.getUser().getRole();
+
+            LegalCase legalCase = caseService.getCaseDetailsWithPrivacy(id, lawyerId, role);
+            var services = caseServiceManager.getItemsByCaseId(id);
+            var hearings = hearingService.getHearingsByCase(id);
+            var invoice = invoiceService.getInvoiceByCaseId(id);
+
+            byte[] excelData = excelService.exportSingleCaseToExcel(legalCase, services, hearings, invoice);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Case_" + legalCase.getCaseNumber() + ".xlsx\"")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(excelData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

@@ -8,11 +8,16 @@ import lombok.RequiredArgsConstructor;
 import com.legalbureau.entity.LegalCase;
 import com.legalbureau.exception.DuplicateResourceException;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.legalbureau.security.CustomUserDetails;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/client")
@@ -24,6 +29,8 @@ public class ClientController {
     private final CaseCategoryService categoryService;
     private final CaseServiceManager caseServiceManager;
     private final HearingService hearingService;
+    private final ExcelService excelService;
+    private final InvoiceService invoiceService;
 
     @GetMapping("/my-cases")
     public String myCases(
@@ -135,5 +142,45 @@ public class ClientController {
         Long clientId = userDetails.getUser().getId();
         caseService.cancelCaseByClient(id, clientId);
         return "redirect:/client/my-cases";
+    }
+
+    @GetMapping("/cases/export")
+    public ResponseEntity<byte[]> exportMyCases(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            Long clientId = userDetails.getUser().getId();
+
+            List<LegalCase> cases = caseService.getFilteredCasesForClient(clientId, null, null, 0, 1000).getContent();
+
+            byte[] excelData = excelService.exportCasesToExcel(cases);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"my_cases_client.xlsx\"")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(excelData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/cases/{id}/export")
+    public org.springframework.http.ResponseEntity<byte[]> exportSingleCaseClient(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            Long clientId = userDetails.getUser().getId();
+            Role role = userDetails.getUser().getRole();
+
+            LegalCase legalCase = caseService.getCaseDetailsWithPrivacy(id, clientId, role);
+            var services = caseServiceManager.getItemsByCaseId(id);
+            var hearings = hearingService.getHearingsByCase(id);
+            var invoice = invoiceService.getInvoiceByCaseId(id);
+
+            byte[] excelData = excelService.exportSingleCaseToExcel(legalCase, services, hearings, invoice);
+
+            return org.springframework.http.ResponseEntity.ok()
+                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Case_" + legalCase.getCaseNumber() + ".xlsx\"")
+                    .contentType(org.springframework.http.MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(excelData);
+        } catch (Exception e) {
+            return org.springframework.http.ResponseEntity.internalServerError().build();
+        }
     }
 }
