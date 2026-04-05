@@ -69,6 +69,15 @@
                     </form>
                     <a th:href="@{/admin/clients/delete/{id}(id=${client.id})}" class="btn btn-sm btn-danger"
                        onclick="return confirm('Видалити клієнта? Це назавжди.');" title="Видалити">🗑</a>
+                    <form th:if="${client.role.name() != 'ADMIN'}"
+                          th:action="@{/admin/clients/{id}/promote(id=${client.id})}"
+                          method="post" class="d-inline">
+                        <button type="submit" class="btn btn-sm btn-outline-danger shadow-sm"
+                                onclick="return confirm('Ви впевнені, що хочете надати цьому користувачу права АДМІНІСТРАТОРА? Він отримає повний доступ до системи!')">
+                            Зробити Адміном
+                        </button>
+                    </form>
+                    <span th:if="${client.role.name() == 'ADMIN'}" class="badge bg-danger">Адміністратор</span>
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(clientPage.content)}">

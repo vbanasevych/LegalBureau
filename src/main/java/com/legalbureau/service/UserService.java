@@ -145,6 +145,16 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    @Transactional
+    public void promoteToAdmin(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Користувача не знайдено"));
+
+        user.setRole(com.legalbureau.entity.enums.Role.ADMIN);
+
+        userRepository.save(user);
+    }
+
     private void validatePhoneNumber(String phone) {
         if (phone == null || !phone.matches("^\\+380-\\d{3}-\\d{3}-\\d{3}$")) {
             throw new IllegalArgumentException("Невірний формат телефону! Використовуйте: +380-XXX-XXX-XXX");

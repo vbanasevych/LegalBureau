@@ -88,4 +88,16 @@ public class AdminController {
         redirectAttributes.addFlashAttribute("success", "Клієнта " + user.getFullName() + " успішно " + action + ".");
         return "redirect:/admin/clients";
     }
+
+    @PostMapping("clients/{id}/promote")
+    public String promoteToAdmin(@PathVariable Long id, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
+        try {
+            userService.promoteToAdmin(id);
+            redirectAttributes.addFlashAttribute("success", "Користувачу успішно надано права Адміністратора!");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+
+        return "redirect:/admin/clients";
+    }
 }
