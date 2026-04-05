@@ -2,6 +2,7 @@ package com.legalbureau.service;
 
 import com.legalbureau.entity.*;
 import com.legalbureau.entity.enums.CaseStatus;
+import com.legalbureau.exception.InvalidImportException;
 import com.legalbureau.exception.ResourceNotFoundException;
 import com.legalbureau.repository.CaseCategoryRepository;
 import com.legalbureau.repository.LawyerRepository;
@@ -54,13 +55,15 @@ public class ExcelService {
         }
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = InvalidImportException.class)
     public void importCasesFromExcel(MultipartFile file, String clientEmail, Long lawyerId) throws Exception {
         User client = userRepository.findByEmail(clientEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("Клієнта з email '" + clientEmail + "' не знайдено в базі. Спочатку створіть його."));
 
         Lawyer lawyer = lawyerRepository.findById(lawyerId)
                 .orElseThrow(() -> new ResourceNotFoundException("Адвоката не знайдено"));
+
+        java.util.List<String> unsavedCases = new java.util.ArrayList<>();
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -97,14 +100,12 @@ public class ExcelService {
                 }
 
                 Optional<CaseCategory> existingCat = categoryRepository.findByName(categoryName);
-                CaseCategory category;
-                if (existingCat.isPresent()) {
-                    category = existingCat.get();
-                } else {
-                    CaseCategory newCat = new CaseCategory();
-                    newCat.setName(categoryName);
-                    category = categoryRepository.save(newCat);
+                if (existingCat.isEmpty()) {
+                    unsavedCases.add(caseNumber + " (вказано неіснуючу категорію: '" + categoryName + "')");
+                    continue;
                 }
+
+                CaseCategory category = existingCat.get();
 
                 LegalCase newCase = new LegalCase();
                 newCase.setCaseNumber(caseNumber);
@@ -117,6 +118,12 @@ public class ExcelService {
 
                 caseRepository.save(newCase);
             }
+        }
+
+        if (!unsavedCases.isEmpty()) {
+            String errorMessage = "Частковий імпорт. Наступні справи не збережено, бо не існує відповідних категорій: "
+                    + String.join(", ", unsavedCases);
+            throw new InvalidImportException(errorMessage);
         }
     }
 

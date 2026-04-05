@@ -6,6 +6,7 @@ import com.legalbureau.entity.User;
 import com.legalbureau.entity.enums.CaseResult;
 import com.legalbureau.entity.enums.Role;
 import com.legalbureau.exception.DuplicateResourceException;
+import com.legalbureau.exception.InvalidImportException;
 import com.legalbureau.exception.ResourceNotFoundException;
 import com.legalbureau.security.CustomUserDetails;
 import com.legalbureau.service.*;
@@ -227,7 +228,7 @@ public class LawyerController {
     }
 
     @PostMapping("/cases/import")
-    public String importCases(@RequestParam("file") org.springframework.web.multipart.MultipartFile file,
+    public String importCases(@RequestParam("file") MultipartFile file,
                               @RequestParam("clientEmail") String clientEmail,
                               @AuthenticationPrincipal CustomUserDetails userDetails,
                               RedirectAttributes redirectAttributes) {
@@ -240,12 +241,13 @@ public class LawyerController {
         } catch (ResourceNotFoundException e) {
             if (e.getMessage().contains("не знайдено")) {
                 redirectAttributes.addFlashAttribute("error", "Клієнта з поштою " + clientEmail + " не знайдено. Будь ласка, зареєструйте його перед імпортом справ.");
-
                 redirectAttributes.addAttribute("email", clientEmail);
-
                 return "redirect:/lawyer/clients/create";
             }
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/lawyer/my-cases";
 
+        } catch (InvalidImportException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/lawyer/my-cases";
 

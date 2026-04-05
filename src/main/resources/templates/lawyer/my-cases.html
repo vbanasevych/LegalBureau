@@ -17,6 +17,9 @@
     </div>
 </div>
 
+<div th:if="${success}" class="alert alert-success shadow-sm" th:text="${success}"></div>
+<div th:if="${error}" class="alert alert-danger shadow-sm" th:text="${error}"></div>
+
 <div class="card shadow-sm border-success mb-4">
     <div class="card-body">
         <h6 class="card-title text-success">📤 Швидкий імпорт справ з Excel</h6>
