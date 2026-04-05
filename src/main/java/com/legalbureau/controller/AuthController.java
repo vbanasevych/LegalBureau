@@ -86,7 +86,16 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public String processResetPassword(@RequestParam String token, @RequestParam String password, RedirectAttributes attributes) {
+    public String processResetPassword(@RequestParam String token,
+                                       @RequestParam String password,
+                                       @RequestParam String confirmPassword,
+                                       RedirectAttributes attributes) {
+
+        if (!password.equals(confirmPassword)) {
+            attributes.addFlashAttribute("error", "Паролі не співпадають! Спробуйте ще раз.");
+            return "redirect:/reset-password?token=" + token;
+        }
+
         passwordResetService.updatePassword(token, password);
         attributes.addFlashAttribute("success", "Пароль успішно змінено! Тепер ви можете увійти.");
         return "redirect:/login";

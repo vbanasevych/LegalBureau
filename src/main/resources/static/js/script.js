@@ -54,3 +54,20 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+
+document.getElementById('resetForm').addEventListener('submit', function(event) {
+    const pwd = document.getElementById('registerPassword').value;
+    const confirmPwd = document.getElementById('confirmPassword').value;
+    const errorMsg = document.getElementById('match-error');
+
+    if (pwd !== confirmPwd) {
+        event.preventDefault();
+        errorMsg.classList.remove('d-none');
+    } else {
+        errorMsg.classList.add('d-none');
+    }
+});
+
+document.getElementById('confirmPassword').addEventListener('input', function() {
+    document.getElementById('match-error').classList.add('d-none');
+});
