@@ -36,10 +36,10 @@ public class LawyerController {
     private final CaseServiceManager caseServiceManager;
     private final CaseCategoryService categoryService;
     private final UserService userService;
-    private final PasswordEncoder passwordEncoder;
     private final HearingService hearingService;
     private final InvoiceService invoiceService;
     private final ExcelService excelService;
+    private final WordService wordService;
 
     @GetMapping("/my-cases")
     public String myCases(
@@ -228,13 +228,22 @@ public class LawyerController {
     }
 
     @PostMapping("/cases/import")
-    public String importCases(@RequestParam("file") MultipartFile file,
+    public String importCases(@RequestParam("file") org.springframework.web.multipart.MultipartFile file,
                               @RequestParam("clientEmail") String clientEmail,
                               @AuthenticationPrincipal CustomUserDetails userDetails,
                               RedirectAttributes redirectAttributes) {
         try {
             Long lawyerId = userDetails.getUser().getId();
-            excelService.importCasesFromExcel(file, clientEmail, lawyerId);
+            String filename = file.getOriginalFilename();
+
+            if (filename != null && filename.endsWith(".docx")) {
+                wordService.importCasesFromWord(file, clientEmail, lawyerId);
+            } else if (filename != null && filename.endsWith(".xlsx")) {
+                excelService.importCasesFromExcel(file, clientEmail, lawyerId);
+            } else {
+                throw new IllegalArgumentException("Непідтримуваний формат файлу. Використовуйте .xlsx або .docx");
+            }
+
             redirectAttributes.addFlashAttribute("success", "Справи успішно імпортовано!");
             return "redirect:/lawyer/my-cases";
 
@@ -251,13 +260,17 @@ public class LawyerController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/lawyer/my-cases";
 
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/lawyer/my-cases";
+
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Помилка читання файлу. Переконайтеся, що це коректний Excel формат.");
+            redirectAttributes.addFlashAttribute("error", "Помилка читання файлу. Переконайтеся, що файл має правильну структуру.");
             return "redirect:/lawyer/my-cases";
         }
     }
 
-    @GetMapping("/cases/{id}/export")
+    @GetMapping("/cases/{id}/export/excel")
     public ResponseEntity<byte[]> exportSingleCaseLawyer(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             Long lawyerId = userDetails.getUser().getId();
@@ -274,6 +287,25 @@ public class LawyerController {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Case_" + legalCase.getCaseNumber() + ".xlsx\"")
                     .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                     .body(excelData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/cases/{id}/export/word")
+    public ResponseEntity<byte[]> exportSingleCaseWord(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            Long clientId = userDetails.getUser().getId();
+            Role role = userDetails.getUser().getRole();
+
+            LegalCase legalCase = caseService.getCaseDetailsWithPrivacy(id, clientId, role);
+
+            byte[] wordData = wordService.exportSingleCaseToWord(legalCase);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Case_" + legalCase.getCaseNumber() + ".docx\"")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                    .body(wordData);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }

@@ -31,6 +31,7 @@ public class ClientController {
     private final HearingService hearingService;
     private final ExcelService excelService;
     private final InvoiceService invoiceService;
+    private final WordService wordService;
 
     @GetMapping("/my-cases")
     public String myCases(
@@ -162,8 +163,8 @@ public class ClientController {
         }
     }
 
-    @GetMapping("/cases/{id}/export")
-    public org.springframework.http.ResponseEntity<byte[]> exportSingleCaseClient(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    @GetMapping("/cases/{id}/export/excel")
+    public ResponseEntity<byte[]> exportSingleCaseClient(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             Long clientId = userDetails.getUser().getId();
             Role role = userDetails.getUser().getRole();
@@ -175,12 +176,31 @@ public class ClientController {
 
             byte[] excelData = excelService.exportSingleCaseToExcel(legalCase, services, hearings, invoice);
 
-            return org.springframework.http.ResponseEntity.ok()
-                    .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Case_" + legalCase.getCaseNumber() + ".xlsx\"")
-                    .contentType(org.springframework.http.MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Case_" + legalCase.getCaseNumber() + ".xlsx\"")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                     .body(excelData);
         } catch (Exception e) {
-            return org.springframework.http.ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/cases/{id}/export/word")
+    public ResponseEntity<byte[]> exportSingleCaseWord(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        try {
+            Long lawyerId = userDetails.getUser().getId();
+            Role role = userDetails.getUser().getRole();
+
+            LegalCase legalCase = caseService.getCaseDetailsWithPrivacy(id, lawyerId, role);
+
+            byte[] wordData = wordService.exportSingleCaseToWord(legalCase);
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Case_" + legalCase.getCaseNumber() + ".docx\"")
+                    .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                    .body(wordData);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

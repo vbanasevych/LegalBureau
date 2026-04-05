@@ -22,22 +22,24 @@
 
 <div class="card shadow-sm border-success mb-4">
     <div class="card-body">
-        <h6 class="card-title text-success">📤 Швидкий імпорт справ з Excel</h6>
+        <h6 class="card-title text-success">📤 Швидкий імпорт справ з Excel / Word</h6>
         <form th:action="@{/lawyer/cases/import}" method="post" enctype="multipart/form-data" class="row g-2 align-items-end">
             <div class="col-md-4">
                 <label class="form-label small">Email клієнта (має існувати):</label>
                 <input type="email" name="clientEmail" class="form-control" placeholder="client@gmail.com" required>
             </div>
             <div class="col-md-5">
-                <label class="form-label small">Файл (.xlsx):</label>
-                <input type="file" name="file" class="form-control" accept=".xlsx" required>
+                <label class="form-label small">Файл (.xlsx або .docx):</label>
+                <input type="file" name="file" class="form-control" accept=".xlsx, .docx" required>
             </div>
             <div class="col-md-3 d-grid">
                 <button type="submit" class="btn btn-success">Імпортувати</button>
             </div>
         </form>
         <small class="text-muted mt-2 d-block">
-            * Формат таблиці: Колонки A (Номер справи), B (Категорія), C (Опис проблеми). Заголовок у першому рядку обов'язковий.
+            * Для <b>Excel</b>: таблиця з 3 колонок (Номер | Категорія | Опис).<br>
+            * Для <b>Word</b>: використовуйте формат тексту:<br>
+            <i>Номер: CASE-001<br>Категорія: Сімейне право<br>Опис: Текст...<br>--- (роздільник між справами)</i>
         </small>
     </div>
 </div>
