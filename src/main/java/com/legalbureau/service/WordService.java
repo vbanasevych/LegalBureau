@@ -142,7 +142,10 @@ public class WordService {
         if (categoryName.isEmpty()) categoryName = "Загальна";
         if (description.isEmpty()) description = "Імпортовано з Word";
 
-        if (caseRepository.existsByCaseNumber(caseNumber)) return;
+        if (caseRepository.existsByCaseNumber(caseNumber)) {
+            unsavedCases.add(caseNumber + " (справа з таким номером вже існує)");
+            return;
+        }
 
         Optional<CaseCategory> existingCat = categoryRepository.findByName(categoryName);
         if (existingCat.isEmpty()) {

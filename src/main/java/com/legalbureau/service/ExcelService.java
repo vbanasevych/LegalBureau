@@ -96,6 +96,7 @@ public class ExcelService {
                         ? descCell.getStringCellValue().trim() : "Імпортовано з Excel";
 
                 if (caseRepository.existsByCaseNumber(caseNumber)) {
+                    unsavedCases.add(caseNumber + " (справа з таким номером вже існує)");
                     continue;
                 }
 
